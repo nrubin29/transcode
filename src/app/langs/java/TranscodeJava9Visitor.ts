@@ -2,22 +2,26 @@ import {Java9Visitor} from '../../../antlr/java/Java9Visitor';
 import {
   ArithmeticNode, AssignmentNode, AtomNode,
   BinaryLogicalOperation, BooleanNode,
-  ComparisonNode, DeclarationNode, DotAccessNode,
+  ComparisonNode, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode,
   ExpressionNode,
-  FunctionCallNode, InputNode, IntConversionNode,
+  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode,
   Node, PrintNode,
   RootNode, StringNode,
   UnaryLogicalOperation
 } from '../ast';
 import {
-  AdditiveExpressionContext, AssignmentContext, BlockContext, EqualityExpressionContext,
-  LocalVariableDeclarationContext, MethodInvocation_lfno_primaryContext,
+  AdditiveExpressionContext, AssignmentContext, BlockContext,  BlockStatementsContext,
+  IfThenElseStatementContext, IfThenStatementContext,
+  MethodInvocation_lfno_primaryContext,
+  EqualityExpressionContext,
+  LocalVariableDeclarationContext,
   MethodInvocationContext,
   MultiplicativeExpressionContext,
-  RelationalExpressionContext, TypeNameContext, VariableDeclaratorContext
+  RelationalExpressionContext, StatementContext, TypeNameContext, VariableDeclaratorContext
 } from '../../../antlr/java/Java9Parser';
 import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree} from 'antlr4ts/tree';
+import {IfStatementContext} from '../../../antlr/typescript/TypeScriptParser';
 
 export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visitor<Node> {
   seenRoot = false;
@@ -154,6 +158,81 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
       const operator = this.visitComparisonOperation(ctx.getChild(1));
       return new ComparisonNode(lhs as ExpressionNode, rhs as ExpressionNode, operator);
     }
+  }
+
+  // If statement parsing
+  visitIfThenStatement(ctx: IfThenStatementContext) {
+    const expr = this.visit(ctx.getChild(2));
+    const statements = this.parseStatementsIf(ctx);
+    return new IfStatementNode(expr as ExpressionNode, statements);
+  }
+
+  parseStatementsIfElse(ctx: IfThenElseStatementContext): ExpressionNode[] {
+    const statements: ExpressionNode[] = [];
+    if (ctx.statementNoShortIf().statementWithoutTrailingSubstatement().block()) {
+      const stats = ctx.statementNoShortIf().statementWithoutTrailingSubstatement().block().getChild(1) as BlockStatementsContext;
+      for (const child of stats.children) {
+        statements.push(this.visit(child) as ExpressionNode);
+      }
+    }
+    return statements;
+  }
+
+  parseStatementsIf(ctx: IfThenStatementContext): ExpressionNode[] {
+    const statements: ExpressionNode[] = [];
+    if (ctx.statement().statementWithoutTrailingSubstatement().block()) {
+      const stats = ctx.statement().statementWithoutTrailingSubstatement().block().getChild(1) as BlockStatementsContext;
+      for (const child of stats.children) {
+        statements.push(this.visit(child) as ExpressionNode);
+      }
+    }
+    return statements;
+  }
+
+  visitIfThenElseStatement(ctx: IfThenElseStatementContext) {
+    const expr = this.visit(ctx.getChild(2));
+    const origStats = this.parseStatementsIfElse(ctx);
+    const elseIfs: ElseIfStatementNode[] = [];
+    let elseE: ElseStatementNode = undefined;
+
+    let currCTX: IfThenElseStatementContext = ctx;
+    while (true) {
+      if (currCTX.statement() && currCTX.statement().getChild(0) instanceof IfThenElseStatementContext ||
+        currCTX.statement().getChild(0) instanceof IfThenStatementContext) {
+        const newCTX = currCTX.statement().getChild(0) as (IfThenElseStatementContext | IfThenStatementContext);
+
+        let currStatements;
+        if (newCTX instanceof IfThenElseStatementContext) {
+          currStatements = this.parseStatementsIfElse(newCTX);
+        } else {
+          currStatements = this.parseStatementsIf(newCTX);
+        }
+
+        elseIfs.push(new ElseIfStatementNode(this.visit(newCTX.getChild(2)) as ExpressionNode, currStatements));
+
+        if (newCTX instanceof IfThenElseStatementContext) {
+          currCTX = newCTX;
+        } else {
+          currCTX = null;
+          break;
+        }
+      } else {
+        break;
+      }
+    }
+
+    if (currCTX) {
+      if (currCTX.statement().statementWithoutTrailingSubstatement().block()) {
+        const stats = currCTX.statement().statementWithoutTrailingSubstatement().block().getChild(1) as BlockStatementsContext;
+        const statements: ExpressionNode[] = [];
+        for (const child of stats.children) {
+          statements.push(this.visit(child) as ExpressionNode);
+        }
+        elseE = new ElseStatementNode(statements);
+      }
+    }
+
+    return new IfStatementNode(expr as ExpressionNode, origStats, elseIfs, elseE);
   }
 
   visitAtom(ctx: ParseTree): AtomNode {
