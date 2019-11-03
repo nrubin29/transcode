@@ -48,7 +48,12 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
   }
 
   visitStmt(ctx: StmtContext) {
-    return new StatementNode(this.visit(ctx.getChild(0)));
+    if (ctx.compound_stmt()) {
+      return undefined;
+    }
+    else {
+      return new StatementNode(this.visit(ctx.getChild(0)));
+    }
   }
 
   visitPower(ctx: PowerContext) {
@@ -75,7 +80,7 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
     }
   }
 
-  visitArglist(ctx: ArglistContext) {
+  visitArglist(ctx: ArglistContext): any {
     return ctx.argument().map(a => this.visit(a));
   }
 
