@@ -1,3 +1,4 @@
+/* tslint:disable:prefer-const */
 import {Python3Visitor} from '../../../antlr/python3/Python3Visitor';
 import {
   ArithmeticNode,
@@ -7,7 +8,7 @@ import {
   RootNode,
   UnaryLogicalOperation,
   ExpressionNode,
-  AssignmentNode, AtomNode, BinaryLogicalNode, UnaryLogicalNode, BooleanNode, StringNode
+  AssignmentNode, AtomNode, BinaryLogicalNode, UnaryLogicalNode, ComparisonNode, IfStatementNode, ElseStatementNode, BooleanNode, StringNode
 } from '../ast';
 import {
   ArglistContext,
@@ -21,6 +22,8 @@ import {
   Or_testContext,
   And_testContext,
   Not_testContext,
+  ComparisonContext,
+  If_stmtContext,
 } from '../../../antlr/python3/Python3Parser';
 import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree} from 'antlr4ts/tree';
@@ -49,6 +52,7 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
     return ctx.argument().map(a => this.visit(a));
   }
 
+  // TODO: Add multiple operand support
   visitArith_expr(ctx: Arith_exprContext) {
     if (ctx.childCount === 3) {
       const left = this.visit(ctx.term()[0]);
@@ -70,7 +74,6 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       case 'not': return UnaryLogicalOperation.NOT;
     }
   }
-
 
   visitExpr_stmt(ctx: Expr_stmtContext) {
     if (ctx.childCount === 3) {
@@ -108,15 +111,40 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
     }
   }
 
+  visitComparison(ctx: ComparisonContext) {
+    if (ctx.childCount === 3) {
+      const left = this.visit(ctx.star_expr(0));
+      const right = this.visit(ctx.star_expr(1));
+      const operator = this.visitComparisonOperation(ctx.comp_op(0));
+      return new ComparisonNode(left as ExpressionNode, right as ExpressionNode, operator);
+    }
+  }
+
   visitAtom(ctx: ParseTree): AtomNode {
     if (ctx.text === 'True' || ctx.text === 'False') {
       return new BooleanNode(ctx.text === 'True');
-    }
-
-    else if (ctx.text.startsWith('"') || ctx.text.startsWith('\'')) {
+    } else if (ctx.text.startsWith('"') || ctx.text.startsWith('\'')) {
       return new StringNode(ctx.text.substring(1, ctx.text.length - 1));
     }
 
     return super.visitAtom(ctx);
   }
+
+  // TODO: Add if-elif support
+  visitIf_stmt(ctx: If_stmtContext) {
+    let statements: Node[] = [];
+    let condition;
+    if (ctx.childCount === 4) {
+      condition = this.visit(ctx.test(0));
+      ctx.suite(0).stmt().map(item => statements.push(this.visit(item)));
+      return new IfStatementNode(condition, statements);
+    } else if (ctx.childCount === 7) {
+      let elseStatements: Node[] = [];
+      condition = this.visit(ctx.test(0));
+      ctx.suite(0).stmt().map(item => statements.push(this.visit(item)));
+      ctx.suite(1).stmt().map(item => elseStatements.push(this.visit(item)));
+      return new IfStatementNode(condition, statements, [],  new ElseStatementNode(elseStatements));
+    }
+  }
+
 }

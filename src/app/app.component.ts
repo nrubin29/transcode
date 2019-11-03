@@ -39,28 +39,34 @@ export class AppComponent implements OnInit {
 
     this.source.writeValue('a = 10\n');
 
-//     const pythonCode = `print(1 + 2 * 3)
-// `;
-//     const javaCode = `println(1 + 2 * 3);`;
-//     const typescriptCode = `log(1 + 2 * 3)`;
-//
-//     const pythonAst = this.python3.convertAntlrToAst(this.python3.convertCodeToAntlr(pythonCode));
-//     const javaAst = this.java.convertAntlrToAst(this.java.convertCodeToAntlr(javaCode));
-//     const tsAst = this.typescript.convertAntlrToAst(this.typescript.convertCodeToAntlr(typescriptCode));
-//
-//     console.log('Python:');
-//     console.log(pythonAst);
-//     console.log(this.java.convertAstToCode(pythonAst));
-//     console.log();
-//
-//     console.log('Java:');
-//     console.log(javaAst);
-//     console.log(this.java.convertAstToCode(javaAst));
-//     console.log();
-//
-//     console.log('TypeScript:');
-//     console.log(tsAst);
-//     console.log();
+    const pythonCode = `if a > b:
+      c = d + e
+      j = j+k
+      print(10)
+    else:
+      k = 10
+      c = a and b
+      print(100, b)`;
+    const javaCode = `println(1 + 2 * 3);`;
+    const typescriptCode = `log(1 + 2 * 3)`;
+
+    const pythonAst = this.python3.convertAntlrToAst(this.python3.convertCodeToAntlr(pythonCode));
+    const javaAst = this.java.convertAntlrToAst(this.java.convertCodeToAntlr(javaCode));
+    const tsAst = this.typescript.convertAntlrToAst(this.typescript.convertCodeToAntlr(typescriptCode));
+
+    console.log('Python:');
+    console.log(pythonAst);
+    console.log(this.java.convertAstToCode(pythonAst));
+    console.log();
+
+    console.log('Java:');
+    console.log(javaAst);
+    console.log(this.java.convertAstToCode(javaAst));
+    console.log();
+
+    console.log('TypeScript:');
+    console.log(tsAst);
+    console.log();
   }
 
   get languageValues() {

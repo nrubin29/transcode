@@ -4,7 +4,7 @@ import {
   AssignmentNode,
   BinaryLogicalNode,
   BinaryLogicalOperation, BooleanNode,
-  ComparisonNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
+  ComparisonNode, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
   FunctionCallNode, IfStatementNode, PrimitiveType, StringNode, Type,
   UnaryLogicalNode,
   UnaryLogicalOperation, WhileLoopNode
@@ -13,35 +13,39 @@ import {
 export class Python3AstVisitor extends StringAstVisitor {
 
   visitArithmeticNode(arithmetic: ArithmeticNode): string {
-    return '';
+    return this.visit(arithmetic.left) + ' ' + this.visitArithmeticOperation(arithmetic.operation) + ' ' + this.visit(arithmetic.right);
   }
 
   visitAssignmentNode(assignment: AssignmentNode): string {
-    return '';
+    return this.visit(assignment.name) + ' = ' + this.visit(assignment.value);
   }
 
   visitBinaryLogicalNode(logic: BinaryLogicalNode): string {
-    return '';
+    return this.visit(logic.left) + ' ' + this.visitBinaryLogicalOperation(logic.operation) + ' ' + this.visit(logic.right);
   }
 
   visitBinaryLogicalOperation(operation: BinaryLogicalOperation): string {
-    return '';
-  }
+    switch (operation) {
+      case BinaryLogicalOperation.AND: return 'and';
+      case BinaryLogicalOperation.OR: return 'or';
+    }  }
 
   visitComparisonNode(comparison: ComparisonNode): string {
-    return '';
+    return this.visit(comparison.left) + ' ' + this.visitComparisonOperation(comparison.operation) + ' ' + this.visit(comparison.right);
   }
 
   visitFunctionCallNode(functionCall: FunctionCallNode): string {
-    return '';
+    return this.visit(functionCall.func) + '(' + functionCall.args.map(child => this.visit(child)).join(', ') + ')';
   }
 
   visitUnaryLogicalNode(logic: UnaryLogicalNode): string {
-    return '';
+    return this.visitUnaryLogicalOperation(logic.operation) + this.visit(logic.left);
   }
 
   visitUnaryLogicalOperation(operation: UnaryLogicalOperation): string {
-    return '';
+    switch (operation) {
+      case UnaryLogicalOperation.NOT: return 'not';
+    }
   }
 
   visitArrayAccessNode(arrayAccess: ArrayAccessNode): string {
@@ -57,7 +61,7 @@ export class Python3AstVisitor extends StringAstVisitor {
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
-    return '';
+    return 'else:\n' + elseStatement.statements.map(child => '  ' + this.visit(child)).join('\n');
   }
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
@@ -65,7 +69,8 @@ export class Python3AstVisitor extends StringAstVisitor {
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return '';
+    return 'if ' + this.visit(ifStatement.condition) + ':\n' + ifStatement.statements.map(child => '  ' + this.visit(child)).join('\n')
+      + '\n' + (ifStatement.els ? this.visitElseStatementNode(ifStatement.els) : '');
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
@@ -81,20 +86,28 @@ export class Python3AstVisitor extends StringAstVisitor {
   }
 
   visitType(type: Type): string {
-    let typeName: string;
+    let typeName: string = '';
+
+    if (type.isArray) {
+      typeName = 'Array[';
+    }
 
     switch (type.type) {
-      case PrimitiveType.BOOLEAN: typeName = 'bool'; break;
-      case PrimitiveType.FLOAT: typeName = 'float'; break;
-      case PrimitiveType.INTEGER: typeName = 'int'; break;
-      case PrimitiveType.OBJECT: typeName = 'object'; break;
-      case PrimitiveType.STRING: typeName = 'str'; break;
+      case PrimitiveType.BOOLEAN: typeName += 'bool'; break;
+      case PrimitiveType.FLOAT: typeName += 'float'; break;
+      case PrimitiveType.INTEGER: typeName += 'int'; break;
+      case PrimitiveType.OBJECT: typeName += 'object'; break;
+      case PrimitiveType.STRING: typeName += 'str'; break;
     }
 
     if (type.isArray) {
-      typeName += '[]';
+      typeName += ']';
     }
 
     return typeName;
+  }
+
+  visitDeclarationNode(declaration: DeclarationNode): string {
+    return this.visit(declaration.name) + ' = ' + this.visit(declaration.value);
   }
 }
