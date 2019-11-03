@@ -6,22 +6,21 @@ import {
   ExpressionNode,
   FunctionCallNode, IfStatementNode, InputNode, IntConversionNode,
   Node, PrintNode,
-  RootNode, StringNode,
+  RootNode, StatementNode, StringNode,
   UnaryLogicalOperation
 } from '../ast';
 import {
-  AdditiveExpressionContext, AssignmentContext, BlockContext,  BlockStatementsContext,
+  AdditiveExpressionContext, AssignmentContext, BlockContext, BlockStatementsContext,
   IfThenElseStatementContext, IfThenStatementContext,
   MethodInvocation_lfno_primaryContext,
   EqualityExpressionContext,
   LocalVariableDeclarationContext,
   MethodInvocationContext,
   MultiplicativeExpressionContext,
-  RelationalExpressionContext, StatementContext, TypeNameContext, VariableDeclaratorContext
+  RelationalExpressionContext, StatementContext, TypeNameContext, VariableDeclaratorContext, BlockStatementContext
 } from '../../../antlr/java/Java9Parser';
 import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree} from 'antlr4ts/tree';
-import {IfStatementContext} from '../../../antlr/typescript/TypeScriptParser';
 
 export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visitor<Node> {
   seenRoot = false;
@@ -29,13 +28,13 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
   visitBlock(ctx: BlockContext) {
     if (!this.seenRoot) {
       this.seenRoot = true;
-      return new RootNode(ctx.blockStatements().blockStatement().map(child => this.visit(child)));
+      return new RootNode(ctx.blockStatements().blockStatement().map(child => this.visit(child)) as StatementNode[]);
     }
   }
 
-  // visitBlockStatements(ctx: BlockStatementsContext) {
-  //
-  // }*/
+  visitBlockStatement(ctx: BlockStatementContext) {
+    return new StatementNode(this.visit(ctx.getChild(0)));
+  }
 
   visitMethodInvocation(ctx: MethodInvocationContext) {
     console.log(ctx);
@@ -167,23 +166,23 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
     return new IfStatementNode(expr as ExpressionNode, statements);
   }
 
-  parseStatementsIfElse(ctx: IfThenElseStatementContext): ExpressionNode[] {
-    const statements: ExpressionNode[] = [];
+  parseStatementsIfElse(ctx: IfThenElseStatementContext): StatementNode[] {
+    const statements: StatementNode[] = [];
     if (ctx.statementNoShortIf().statementWithoutTrailingSubstatement().block()) {
       const stats = ctx.statementNoShortIf().statementWithoutTrailingSubstatement().block().getChild(1) as BlockStatementsContext;
       for (const child of stats.children) {
-        statements.push(this.visit(child) as ExpressionNode);
+        statements.push(this.visit(child) as StatementNode);
       }
     }
     return statements;
   }
 
-  parseStatementsIf(ctx: IfThenStatementContext): ExpressionNode[] {
-    const statements: ExpressionNode[] = [];
+  parseStatementsIf(ctx: IfThenStatementContext): StatementNode[] {
+    const statements: StatementNode[] = [];
     if (ctx.statement().statementWithoutTrailingSubstatement().block()) {
       const stats = ctx.statement().statementWithoutTrailingSubstatement().block().getChild(1) as BlockStatementsContext;
       for (const child of stats.children) {
-        statements.push(this.visit(child) as ExpressionNode);
+        statements.push(this.visit(child) as StatementNode);
       }
     }
     return statements;
@@ -224,9 +223,9 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
     if (currCTX) {
       if (currCTX.statement().statementWithoutTrailingSubstatement().block()) {
         const stats = currCTX.statement().statementWithoutTrailingSubstatement().block().getChild(1) as BlockStatementsContext;
-        const statements: ExpressionNode[] = [];
+        const statements: StatementNode[] = [];
         for (const child of stats.children) {
-          statements.push(this.visit(child) as ExpressionNode);
+          statements.push(this.visit(child) as StatementNode);
         }
         elseE = new ElseStatementNode(statements);
       }

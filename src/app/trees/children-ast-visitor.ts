@@ -6,7 +6,7 @@ import {
   ElseStatementNode, ForLoopNode,
   FunctionCallNode, IfStatementNode,
   RootNode, StringNode, Type, UnaryLogicalNode, UnaryLogicalOperation, WhileLoopNode,
-  Node, DeclarationNode, InputNode, IntConversionNode, PrintNode
+  Node, DeclarationNode, InputNode, IntConversionNode, PrintNode, StatementNode
 } from '../langs/ast';
 import {AstVisitor} from '../langs/ast-visitor';
 
@@ -116,5 +116,9 @@ export class ChildrenAstVisitor extends AstVisitor<Node[]> {
 
   visitPrintNode(print: PrintNode): Node[] {
     return [].concat(...print.args.map(arg => this.visit(arg)));
+  }
+
+  visitStatementNode(statement: StatementNode): Node[] {
+    return this.visit(statement.node);
   }
 }

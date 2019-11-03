@@ -5,7 +5,7 @@ import {
   BinaryLogicalNode,
   BinaryLogicalOperation, BooleanNode,
   ComparisonNode, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, PrimitiveType, PrintNode, RootNode, StringNode, Type,
+  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, PrimitiveType, PrintNode, RootNode, StatementNode, StringNode, Type,
   UnaryLogicalNode,
   UnaryLogicalOperation, WhileLoopNode
 } from '../ast';
@@ -24,8 +24,12 @@ export class Java9AstVisitor extends StringAstVisitor {
     return val;
   }
 
+  visitStatementNode(statement: StatementNode): string {
+    return this.visit(statement.node) + ';';
+  }
+
   visitFunctionCallNode(functionCall: FunctionCallNode): string {
-    return this.visit(functionCall.func) + '(' + functionCall.args.map(child => this.visit(child)).join(', ') + ');';
+    return this.visit(functionCall.func) + '(' + functionCall.args.map(child => this.visit(child)).join(', ') + ')';
   }
 
   visitArithmeticNode(arithmetic: ArithmeticNode): string {
@@ -34,7 +38,7 @@ export class Java9AstVisitor extends StringAstVisitor {
 
   visitAssignmentNode(assignment: AssignmentNode): string {
     if (this.variablesSeen.has(assignment.name.atom)) {
-      return this.visit(assignment.name) + ' = ' + this.visit(assignment.value) + ';';
+      return this.visit(assignment.name) + ' = ' + this.visit(assignment.value);
     }
 
     else {
@@ -54,7 +58,7 @@ export class Java9AstVisitor extends StringAstVisitor {
 
   visitDeclarationNode(declaration: DeclarationNode): string {
     this.variablesSeen.add(declaration.name.atom);
-    return this.visitType(declaration.value.type) + ' ' + this.visit(declaration.name) + ' = ' + this.visit(declaration.value) + ';';
+    return this.visitType(declaration.value.type) + ' ' + this.visit(declaration.name) + ' = ' + this.visit(declaration.value);
   }
 
   visitUnaryLogicalNode(logic: UnaryLogicalNode): string {
@@ -95,7 +99,7 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n}' + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n') + (ifStatement.els ? this.visit(ifStatement.els) : '');
+    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n}' + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n') + '\n' + (ifStatement.els ? this.visit(ifStatement.els) : '');
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
@@ -121,11 +125,11 @@ export class Java9AstVisitor extends StringAstVisitor {
 
   visitPrintNode(print: PrintNode): string {
     if (print.args.length === 0) {
-      return 'System.out.println();';
+      return 'System.out.println()';
     }
 
     else {
-      return print.args.map(pr => 'System.out.println(' + this.visit(pr) + ');').join('\n');
+      return print.args.map(pr => 'System.out.println(' + this.visit(pr) + ')').join(';\n');
     }
   }
 

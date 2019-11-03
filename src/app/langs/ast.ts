@@ -46,7 +46,11 @@ export abstract class Node {
 }
 
 export class RootNode extends Node {
-  constructor(public children: Node[] = []) { super(); }
+  constructor(public children: StatementNode[]) { super(); }
+}
+
+export class StatementNode extends Node {
+  constructor(public node: Node) { super(); }
 }
 
 export abstract class ExpressionNode extends Node {
@@ -91,23 +95,23 @@ export class ArrayAccessNode extends ExpressionNode {
 }
 
 export class IfStatementNode extends Node {
-  constructor(public condition: ExpressionNode, public statements: Node[], public elseIfs: ElseIfStatementNode[] = [], public els?: ElseStatementNode) { super(); }
+  constructor(public condition: ExpressionNode, public statements: StatementNode[], public elseIfs: ElseIfStatementNode[] = [], public els?: ElseStatementNode) { super(); }
 }
 
 export class ElseIfStatementNode extends Node {
-  constructor(public condition: ExpressionNode, public statements: Node[]) { super(); }
+  constructor(public condition: ExpressionNode, public statements: StatementNode[]) { super(); }
 }
 
 export class ElseStatementNode extends Node {
-  constructor(public statements: Node[]) { super(); }
+  constructor(public statements: StatementNode[]) { super(); }
 }
 
 export class WhileLoopNode extends Node {
-  constructor(public condition: ExpressionNode, public statements: Node[]) { super(); }
+  constructor(public condition: ExpressionNode, public statements: StatementNode[]) { super(); }
 }
 
 export class ForLoopNode extends Node {
-  constructor(public controlVariable: AtomNode, public start: ExpressionNode, public stop: ExpressionNode, public step: ExpressionNode, public statements: Node[]) { super(); }
+  constructor(public controlVariable: AtomNode, public start: ExpressionNode, public stop: ExpressionNode, public step: ExpressionNode, public statements: StatementNode[]) { super(); }
 }
 
 export class PrintNode extends Node {

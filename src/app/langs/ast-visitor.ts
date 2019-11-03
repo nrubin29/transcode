@@ -9,7 +9,7 @@ import {
   ComparisonOperation, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
   FunctionCallNode, IfStatementNode, InputNode, IntConversionNode,
   Node, PrintNode,
-  RootNode, StringNode, Type,
+  RootNode, StatementNode, StringNode, Type,
   UnaryLogicalNode,
   UnaryLogicalOperation, WhileLoopNode
 } from './ast';
@@ -31,23 +31,17 @@ export abstract class AstVisitor<T> {
 
     console.log(node.constructor.name, node);
 
-    try {
-      return this['visit' + node.constructor.name](node);
-    }
-
-    catch (e) {
-      console.error('Missing a visitor?');
-      throw e;
-    }
+    return this['visit' + node.constructor.name](node);
   }
 
-  abstract visitRootNode(root: RootNode): T;
   abstract visitAtomNode(atom: AtomNode): T;
   abstract visitBooleanNode(bool: BooleanNode): T;
   abstract visitStringNode(str: StringNode): T;
+
+  abstract visitRootNode(root: RootNode): T;
+  abstract visitStatementNode(statement: StatementNode): T;
   abstract visitDeclarationNode(declaration: DeclarationNode): T;
   abstract visitAssignmentNode(assignment: AssignmentNode): T;
-
   abstract visitArithmeticNode(arithmetic: ArithmeticNode): T;
   abstract visitUnaryLogicalNode(logic: UnaryLogicalNode): T;
   abstract visitBinaryLogicalNode(logic: BinaryLogicalNode): T;

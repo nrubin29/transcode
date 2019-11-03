@@ -16,7 +16,7 @@ import {
   FunctionCallNode,
   IfStatementNode, InputNode, IntConversionNode,
   PrimitiveType, PrintNode,
-  RootNode,
+  RootNode, StatementNode,
   StringNode,
   Type,
   UnaryLogicalNode,
@@ -30,6 +30,10 @@ import {AstVisitor} from './ast-visitor';
  */
 export class TypeAstVisitor extends AstVisitor<void> {
   vars = {}; // Keeps track of variables for their types. Assumes a single scope. This is bad!
+
+  visitStatementNode(statement: StatementNode): void {
+    this.visit(statement.node);
+  }
 
   visitArithmeticNode(arithmetic: ArithmeticNode): void {
     this.visit(arithmetic.left);
