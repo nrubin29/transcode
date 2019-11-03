@@ -24,15 +24,12 @@
       <app-codemirror #target [config]="{mode: targetLanguage.mode, readOnly: true}"></app-codemirror>
     </div>
   </div>
-  <div class="flex right" style="margin-top: 1em">
-    <button mat-raised-button color="primary" (click)="translate()">Translate Code</button>
+  <div class="flex display-side" style="margin-top: 1em">
+    <div>
+      <button mat-raised-button color="primary" (click)="showTrees()" [disabled]="!antlrTree || !ast">Show trees</button>
+    </div>
+    <div class="flex right">
+      <button mat-raised-button color="primary" (click)="translate()">Translate Code</button>
+    </div>
   </div>
-<!--  <div class="flex display-side" style="margin-top: 1em">-->
-<!--    <div>-->
-<!--      <button mat-raised-button color="primary" (click)="showTrees()" [disabled]="!antlrTree || !ast">Show trees</button>-->
-<!--    </div>-->
-<!--    <div class="flex right">-->
-<!--      <button mat-raised-button color="primary" (click)="translate()">Translate Code</button>-->
-<!--    </div>-->
-<!--  </div>-->
 </div>
