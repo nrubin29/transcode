@@ -87,11 +87,11 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n} ' + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n') + (ifStatement.els ? this.visit(ifStatement.els) : '');
+    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n}' + (ifStatement.elseIfs.length > 0 ? '\n\n' : '') + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n\n') + (ifStatement.els ? '\n\n' + this.visit(ifStatement.els) : '');
   }
 
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
-    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' + elseIfStatement.statements.map(statement => '  ' + this.visit(statement)).join('\n') + '\n} ';
+    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' + elseIfStatement.statements.map(statement => '  ' + this.visit(statement)).join('\n') + '\n}';
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
@@ -99,7 +99,7 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
-    return 'for (' + this.visitType(forLoopNode.start.type) + ' ' + this.visit(forLoopNode.controlVariable) + ' = ' + this.visit(forLoopNode.start) + '; ' + this.visit(forLoopNode.controlVariable) + ' < ' + this.visit(forLoopNode.stop) + '; ' + this.visit(forLoopNode.controlVariable) + ' += ' + this.visit(forLoopNode.step) + ' {' + forLoopNode.statements.map(statement => '\t' + this.visit(statement)) + '}';
+    return 'for (' + this.visitType(forLoopNode.start.type) + ' ' + this.visit(forLoopNode.controlVariable) + ' = ' + this.visit(forLoopNode.start) + '; ' + this.visit(forLoopNode.controlVariable) + ' < ' + this.visit(forLoopNode.stop) + '; ' + this.visit(forLoopNode.controlVariable) + ' += ' + this.visit(forLoopNode.step) + ') {\n' + forLoopNode.statements.map(statement => '  ' + this.visit(statement)).join('\n') + '\n}';
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {

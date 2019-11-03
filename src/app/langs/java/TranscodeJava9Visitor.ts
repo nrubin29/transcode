@@ -3,7 +3,7 @@ import {
   ArithmeticNode, AssignmentNode, AtomNode,
   BinaryLogicalOperation, BooleanNode,
   ComparisonNode, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode,
-  ExpressionNode,
+  ExpressionNode, ForLoopNode,
   FunctionCallNode, IfStatementNode, InputNode, IntConversionNode,
   Node, PrintNode,
   RootNode, StatementNode, StringNode,
@@ -17,7 +17,7 @@ import {
   LocalVariableDeclarationContext,
   MethodInvocationContext,
   MultiplicativeExpressionContext,
-  RelationalExpressionContext, StatementContext, TypeNameContext, VariableDeclaratorContext, BlockStatementContext
+  RelationalExpressionContext, StatementContext, TypeNameContext, VariableDeclaratorContext, BlockStatementContext, BasicForStatementContext
 } from '../../../antlr/java/Java9Parser';
 import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree} from 'antlr4ts/tree';
@@ -33,7 +33,21 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
   }
 
   visitBlockStatement(ctx: BlockStatementContext) {
-    return new StatementNode(this.visit(ctx.getChild(0)));
+    if (
+      ctx.statement() &&
+      (ctx.statement().forStatement() ||
+        ctx.statement().ifThenStatement() ||
+        ctx.statement().ifThenElseStatement() ||
+        ctx.statement().whileStatement()
+      )
+    ) {
+      // Don't wrap these things in a block.
+      return undefined;
+    }
+
+    else {
+      return new StatementNode(this.visit(ctx.getChild(0)));
+    }
   }
 
   visitMethodInvocation(ctx: MethodInvocationContext) {
@@ -157,6 +171,22 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
       const operator = this.visitComparisonOperation(ctx.getChild(1));
       return new ComparisonNode(lhs as ExpressionNode, rhs as ExpressionNode, operator);
     }
+  }
+
+  visitBasicForStatement(ctx: BasicForStatementContext) {
+    const init = ctx.forInit().localVariableDeclaration().variableDeclaratorList().variableDeclarator()[0];
+    const controlVariable = this.visit(init.variableDeclaratorId());
+    const start = this.visit(init.variableInitializer());
+
+    const condition = this.visit(ctx.expression()) as ComparisonNode;
+    const stop = condition.right;
+
+    const update = this.visit(ctx.forUpdate()) as AssignmentNode;
+    const step = update.value;
+
+    const statements = ctx.statement().statementWithoutTrailingSubstatement().block().blockStatements().blockStatement().map(statement => this.visit(statement));
+
+    return new ForLoopNode(controlVariable as AtomNode, start as ExpressionNode, stop, step, statements as StatementNode[]);
   }
 
   // If statement parsing
