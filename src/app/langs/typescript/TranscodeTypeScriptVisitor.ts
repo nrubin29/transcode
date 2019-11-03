@@ -56,7 +56,9 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
   }
 
   visitVariableStatement(ctx: VariableStatementContext) {
-    return this.visit(ctx.getChild(1));
+    if (ctx.variableDeclarationList()) {
+      return this.visit(ctx.variableDeclarationList());
+    }
   }
 
   // Variable assignments and Function Calls
@@ -121,7 +123,7 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
             if (opExpr.getChild(0) instanceof TerminalNode && opExpr.getChild(1) instanceof SingleExpressionContext) {
               const oper = this.visitArithmeticOperation(opExpr.getChild(0));
               const rhsExpr = opExpr.getChild(1);
-              if (rhsExpr.childCount === 1 && rhsExpr.getChild(0) instanceof IdentifierNameContext) {
+              if (rhsExpr.childCount === 1) {
                 // Non-Arithmetic addition aka a + b but not 4 + 5
                 const rhs = this.visit(rhsExpr.getChild(0));
 
