@@ -35,6 +35,7 @@ import {
   ComparisonContext,
   If_stmtContext,
   For_stmtContext,
+  TermContext,
 } from '../../../antlr/python3/Python3Parser';
 import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree} from 'antlr4ts/tree';
@@ -89,6 +90,15 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
     if (ctx.childCount === 3) {
       const left = this.visit(ctx.term()[0]);
       const right = this.visit(ctx.term()[1]);
+      const operator = this.visitArithmeticOperation(ctx.getChild(1));
+      return new ArithmeticNode(left as ExpressionNode, right as ExpressionNode, operator);
+    }
+  }
+
+  visitTerm(ctx: TermContext) {
+    if (ctx.childCount === 3) {
+      const left = this.visit(ctx.factor(0));
+      const right = this.visit(ctx.factor(1));
       const operator = this.visitArithmeticOperation(ctx.getChild(1));
       return new ArithmeticNode(left as ExpressionNode, right as ExpressionNode, operator);
     }
