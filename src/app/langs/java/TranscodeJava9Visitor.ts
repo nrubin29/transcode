@@ -2,7 +2,7 @@ import {Java9Visitor} from '../../../antlr/java/Java9Visitor';
 import {
   ArithmeticNode, AssignmentNode, AtomNode,
   BinaryLogicalOperation,
-  ComparisonNode,
+  ComparisonNode, DeclarationNode,
   ExpressionNode,
   FunctionCallNode,
   Node,
@@ -10,7 +10,7 @@ import {
   UnaryLogicalOperation
 } from '../ast';
 import {
-  AdditiveExpressionContext, BlockStatementsContext,
+  AdditiveExpressionContext, AssignmentContext, BlockStatementsContext,
   EqualityExpressionContext,
   LocalVariableDeclarationContext,
   MethodInvocationContext,
@@ -52,17 +52,17 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
     console.log('variable');
     const name = this.visit(ctx.variableDeclaratorId());
     const value = this.visit(ctx.variableInitializer());
-    return new AssignmentNode(name as AtomNode, value as ExpressionNode);
+    return new DeclarationNode(name as AtomNode, value as ExpressionNode);
   }
 
-  // visitAssignment(ctx: AssignmentContext) {
-  //   if (ctx.childCount === 3) {
-  //     // TODO: look at assignmentOperator.
-  //     const name = this.visit(ctx.leftHandSide());
-  //     const value = this.visit(ctx.expression());
-  //     return new AssignmentNode(name as AtomNode, value as ExpressionNode);
-  //   }
-  // }
+  visitAssignment(ctx: AssignmentContext) {
+    if (ctx.childCount === 3) {
+      // TODO: look at assignmentOperator.
+      const name = this.visit(ctx.leftHandSide());
+      const value = this.visit(ctx.expression());
+      return new AssignmentNode(name as AtomNode, value as ExpressionNode);
+    }
+  }
 
   visitAdditiveExpression(ctx: AdditiveExpressionContext) {
     if (ctx.childCount === 3) {
