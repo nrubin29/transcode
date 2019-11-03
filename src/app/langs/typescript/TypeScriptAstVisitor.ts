@@ -1,74 +1,105 @@
 import {StringAstVisitor} from '../ast-visitor';
 import {
-  ArithmeticNode, ArrayAccessNode,
+  ArithmeticNode,
+  ArrayAccessNode,
   AssignmentNode,
   BinaryLogicalNode,
-  BinaryLogicalOperation, BooleanNode,
-  ComparisonNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode, PrimitiveType, StringNode, Type,
+  BinaryLogicalOperation,
+  BooleanNode,
+  ComparisonNode,
+  DotAccessNode,
+  ElseIfStatementNode,
+  ElseStatementNode,
+  ForLoopNode,
+  FunctionCallNode,
+  IfStatementNode,
+  PrimitiveType,
+  StringNode,
+  Type,
   UnaryLogicalNode,
-  UnaryLogicalOperation, WhileLoopNode
+  UnaryLogicalOperation,
+  WhileLoopNode
 } from '../ast';
+import {log} from 'util';
 
 export class TypeScriptAstVisitor extends StringAstVisitor {
   visitArrayAccessNode(arrayAccess: ArrayAccessNode): string {
-    return '';
+    return this.visit(arrayAccess.array) + '[' + this.visit(arrayAccess.index) + ']';
   }
 
   visitDotAccessNode(dotAccess: DotAccessNode): string {
-    return '';
+    return this.visit(dotAccess.left) + '.' + this.visit(dotAccess.right);
   }
 
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
-    return '';
+    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' +
+        elseIfStatement.statements.map(stat => '\t' + this.visit(stat)).join('\n') +
+      '\n}';
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
-    return '';
+    return 'else {\n' + elseStatement.statements.map(stat => '\t' + this.visit(stat)).join('\n') + '\n}';
   }
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
-    return '';
+    const i = this.visit(forLoopNode.controlVariable)
+    return 'for (let ' + i + ' = ' + this.visit(forLoopNode.start) + '; ' +
+      i + ' < ' + this.visit(forLoopNode.stop) + '; ' +
+      this.visit(forLoopNode.step) === '1' ? (i + '++') : (i + ' += ' + this.visit(forLoopNode.step) ) + ' ) {\n' +
+      forLoopNode.statements.map(stat => '\t' + this.visit(stat)).join('\n') +
+      '\n}';
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return '';
+    return 'if ( ' + this.visit(ifStatement.condition) + ' ) {\n' +
+      ifStatement.statements.map(stat => '\t' + this.visit(stat)).join('\n') +
+      '\n}';
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
-    return '';
+    return 'while (' + this.visit(whileLoop.condition) + ' ) {\n' +
+      whileLoop.statements.map(stat => '\t' + this.visit(stat)).join('\n') +
+      '\n}';
   }
 
   visitArithmeticNode(arithmetic: ArithmeticNode): string {
-    return '';
+    return this.visit(arithmetic.left) + ' ' + this.visitArithmeticOperation(arithmetic.operation) + ' ' + this.visit(arithmetic.right);
   }
 
   visitAssignmentNode(assignment: AssignmentNode): string {
-    return '';
+    return 'let ' + this.visit(assignment.name) + ' = ' + this.visit(assignment.value) + ';';
   }
 
   visitBinaryLogicalNode(logic: BinaryLogicalNode): string {
-    return '';
+    return this.visit(logic.left) + ' ' + this.visitBinaryLogicalOperation(logic.operation) + ' ' + this.visit(logic.right);
   }
 
   visitBinaryLogicalOperation(operation: BinaryLogicalOperation): string {
-    return '';
+    switch (operation) {
+      case BinaryLogicalOperation.AND:
+        return '&&';
+      case BinaryLogicalOperation.OR:
+        return '||';
+    }
   }
 
   visitComparisonNode(comparison: ComparisonNode): string {
-    return '';
+    return this.visit(comparison.left) + ' ' + this.visitComparisonOperation(comparison.operation) + ' ' + this.visit(comparison.right);
   }
 
   visitFunctionCallNode(functionCall: FunctionCallNode): string {
-    return '';
+    return this.visit(functionCall.func) + '(' + functionCall.args.map(arg => this.visit(arg)).join(', ') + ')';
   }
 
   visitUnaryLogicalNode(logic: UnaryLogicalNode): string {
-    return '';
+    return this.visitUnaryLogicalOperation(logic.operation) + this.visit(logic.left);
   }
 
   visitUnaryLogicalOperation(operation: UnaryLogicalOperation): string {
-    return '';
+    switch (operation) {
+      case UnaryLogicalOperation.NOT:
+        return '!';
+    }
   }
 
   visitType(type: Type): string {
