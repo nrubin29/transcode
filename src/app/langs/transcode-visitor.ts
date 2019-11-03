@@ -30,15 +30,15 @@ export abstract class TranscodeVisitor {
     }
   }
 
-  visitChildren(node: any): Node {
+  visitChildren(ctx: ParseTree): Node {
     throw new Error(':O');
   }
 
-  visitTerminal(node: any): Node {
-    throw new Error(':O');
+  visitTerminal(ctx: ParseTree): Node {
+    return this.visitAtom(ctx);
   }
 
-  visitErrorNode(node: any): Node {
+  visitErrorNode(ctx: ParseTree): Node {
     throw new Error(':O');
   }
 

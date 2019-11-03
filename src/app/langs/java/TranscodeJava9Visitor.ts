@@ -4,8 +4,6 @@ import {
   AdditiveExpressionContext,
   EqualityExpressionContext,
   ExpressionStatementContext,
-  IdentifierContext,
-  LiteralContext,
   MethodInvocationContext,
   MultiplicativeExpressionContext,
   RelationalExpressionContext
@@ -60,14 +58,6 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
       const operator = this.visitComparisonOperation(ctx.getChild(1));
       return new ComparisonNode(lhs, rhs, operator);
     }
-  }
-
-  visitIdentifier(ctx: IdentifierContext) {
-    return this.visitAtom(ctx);
-  }
-
-  visitLiteral(ctx: LiteralContext) {
-    return this.visitAtom(ctx);
   }
 
   visitUnaryLogicalOperation(operation: ParseTree): UnaryLogicalOperation {
