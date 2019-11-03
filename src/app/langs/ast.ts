@@ -48,7 +48,7 @@ export abstract class Node {
 }
 
 export class RootNode extends Node {
-  constructor(public children: StatementNode[]) { super(); }
+  constructor(public children: Node[]) { super(); }
 }
 
 export class StatementNode extends Node {
