@@ -5,12 +5,16 @@ import {
   BinaryLogicalNode,
   BinaryLogicalOperation, BooleanNode,
   ComparisonNode, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, PrimitiveType, PrintNode, StringNode, Type,
+  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, PrimitiveType, PrintNode, StatementNode, StringNode, Type,
   UnaryLogicalNode,
   UnaryLogicalOperation, WhileLoopNode
 } from '../ast';
 
 export class Python3AstVisitor extends StringAstVisitor {
+
+  visitStatementNode(statement: StatementNode): string {
+    return this.visit(statement.node);
+  }
 
   visitArithmeticNode(arithmetic: ArithmeticNode): string {
     return this.visit(arithmetic.left) + ' ' + this.visitArithmeticOperation(arithmetic.operation) + ' ' + this.visit(arithmetic.right);
@@ -57,7 +61,8 @@ export class Python3AstVisitor extends StringAstVisitor {
   }
 
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
-    return '';
+    return 'elif ' + this.visit(elseIfStatement.condition) + ':\n'
+      + elseIfStatement.statements.map(child => '  ' + this.visit(child)).join('\n');
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
@@ -70,7 +75,8 @@ export class Python3AstVisitor extends StringAstVisitor {
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
     return 'if ' + this.visit(ifStatement.condition) + ':\n' + ifStatement.statements.map(child => '  ' + this.visit(child)).join('\n')
-      + '\n' + (ifStatement.els ? this.visitElseStatementNode(ifStatement.els) : '');
+       + '\n' + (ifStatement.elseIfs ? ifStatement.elseIfs.map(elseIfBlock => this.visitElseIfStatementNode(elseIfBlock)).join('\n') : '')
+        + '\n' + (ifStatement.els ? this.visitElseStatementNode(ifStatement.els) : '');
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
@@ -122,4 +128,5 @@ export class Python3AstVisitor extends StringAstVisitor {
   visitPrintNode(print: PrintNode): string {
     return 'print(' + print.args.map(child => this.visit(child)).join(', ') + ')';
   }
+
 }

@@ -17,10 +17,11 @@ import {
   ElseStatementNode,
   BooleanNode,
   StringNode,
-  PrintNode, InputNode, IntConversionNode
+  PrintNode, InputNode, IntConversionNode, ElseIfStatementNode, StatementNode
 } from '../ast';
 import {
   ArglistContext,
+  StmtContext,
   Arith_exprContext,
   AtomContext,
   File_inputContext,
@@ -36,11 +37,16 @@ import {
 } from '../../../antlr/python3/Python3Parser';
 import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree} from 'antlr4ts/tree';
+import {Statement} from '@angular/compiler';
 
 export class TranscodePython3Visitor extends TranscodeVisitor implements Python3Visitor<Node> {
 
   visitFile_input(ctx: File_inputContext) {
-    return new RootNode(ctx.children.map(child => this.visit(child)));
+    return new RootNode(ctx.children.map(child => this.visit(child)) as StatementNode[]);
+  }
+
+  visitStmt(ctx: StmtContext) {
+    return new StatementNode(this.visit(ctx.getChild(0)));
   }
 
   visitPower(ctx: PowerContext) {
@@ -151,18 +157,38 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
 
   // TODO: Add if-elif support
   visitIf_stmt(ctx: If_stmtContext) {
-    let statements: Node[] = [];
+    let ifStatement: StatementNode[] = [];
+    let elseStatement: StatementNode[] = [];
     let condition;
     if (ctx.childCount === 4) {
       condition = this.visit(ctx.test(0));
-      ctx.suite(0).stmt().map(item => statements.push(this.visit(item)));
-      return new IfStatementNode(condition, statements);
+      ctx.suite(0).stmt().map(item => ifStatement.push(this.visit(item) as StatementNode));
+      return new IfStatementNode(condition, ifStatement);
     } else if (ctx.childCount === 7) {
-      let elseStatements: Node[] = [];
       condition = this.visit(ctx.test(0));
-      ctx.suite(0).stmt().map(item => statements.push(this.visit(item)));
-      ctx.suite(1).stmt().map(item => elseStatements.push(this.visit(item)));
-      return new IfStatementNode(condition, statements, [],  new ElseStatementNode(elseStatements));
+      ctx.suite(0).stmt().map(item => ifStatement.push(this.visit(item) as StatementNode));
+      ctx.suite(1).stmt().map(item => elseStatement.push(this.visit(item) as StatementNode));
+      return new IfStatementNode(condition, ifStatement, [],  new ElseStatementNode(elseStatement));
+    }
+    else if (ctx.childCount > 7) {
+      let elseIfs: ElseIfStatementNode[] = [];
+      const ifCondition = this.visit(ctx.test(0));
+      ctx.suite(0).stmt().map(item => ifStatement.push(this.visit(item) as StatementNode));
+      // Constructing elseifsNode
+      for (let i = 1; i < ctx.test().length; i++) {
+        const elseIfCondition = this.visit(ctx.test(i));
+        let statements: StatementNode[] = [];
+        ctx.suite(i).stmt().map(item => statements.push(this.visit(item) as StatementNode));
+        elseIfs.push(new ElseIfStatementNode(elseIfCondition as ExpressionNode, statements));
+      }
+      if (ctx.ELSE()) {
+        console.log('HERE: ', ctx.ELSE());
+        ctx.suite(ctx.suite().length - 1).stmt().map(item => elseStatement.push(this.visit(item) as StatementNode));
+        return new IfStatementNode(ifCondition as ExpressionNode, ifStatement, elseIfs, new ElseStatementNode(elseStatement));
+      }
+      else {
+        return new IfStatementNode(ifCondition as ExpressionNode, ifStatement, elseIfs);
+      }
     }
   }
 }
