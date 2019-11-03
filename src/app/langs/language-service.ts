@@ -1,4 +1,4 @@
-import {Ast} from '../ast';
+import {Ast} from './ast';
 import {ParserRuleContext} from 'antlr4ts';
 
 /**

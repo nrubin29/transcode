@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import {LanguageService} from './language-service';
+import {LanguageService} from '../language-service';
 import {Ast} from '../ast';
 import {CharStreams, CommonTokenStream} from 'antlr4ts';
-import {Java9Lexer} from '../../antlr/java/Java9Lexer';
-import {ExpressionContext, ExpressionStatementContext, Java9Parser} from '../../antlr/java/Java9Parser';
-import {TranscodeJava9Visitor} from '../../antlr/java/TranscodeJava9Visitor';
+import {Java9Lexer} from '../../../antlr/java/Java9Lexer';
+import {ExpressionContext, ExpressionStatementContext, Java9Parser} from '../../../antlr/java/Java9Parser';
+import {TranscodeJava9Visitor} from './TranscodeJava9Visitor';
+import {Java9AstVisitor} from './Java9AstVisitor';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +27,7 @@ export class JavaService implements LanguageService<ExpressionStatementContext> 
   }
 
   convertAstToCode(ast: Ast): string {
-    return JSON.stringify(ast.root);
+    const visitor = new Java9AstVisitor();
+    return visitor.visit(ast.root);
   }
 }

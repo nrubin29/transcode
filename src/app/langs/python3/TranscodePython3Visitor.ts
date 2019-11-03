@@ -1,5 +1,5 @@
-import {Python3Visitor} from './Python3Visitor';
-import {AtomNode, FunctionCallNode, RootNode, Node, ArithmeticNode} from '../../app/ast';
+import {Python3Visitor} from '../../../antlr/python3/Python3Visitor';
+import {ArithmeticNode, BinaryLogicalOperation, FunctionCallNode, Node, RootNode, UnaryLogicalOperation} from '../ast';
 import {
   ArglistContext,
   Arith_exprContext,
@@ -7,8 +7,9 @@ import {
   File_inputContext,
   PowerContext,
   TrailerContext
-} from './Python3Parser';
+} from '../../../antlr/python3/Python3Parser';
 import {TranscodeVisitor} from '../transcode-visitor';
+import {ParseTree} from 'antlr4ts/tree';
 
 export class TranscodePython3Visitor extends TranscodeVisitor implements Python3Visitor<Node> {
 
@@ -21,10 +22,6 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       const name = this.visitAtom(ctx.atom());
       const args = this.visitTrailer(ctx.trailer()[0]);
       return new FunctionCallNode(name, args);
-    }
-
-    else {
-      return this.visit(ctx.getChild(0));
     }
   }
 
@@ -42,12 +39,21 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
     if (ctx.childCount === 3) {
       const left = this.visit(ctx.term()[0]);
       const right = this.visit(ctx.term()[1]);
-      const operator = this.visitAtom(ctx.getChild(1) as AtomContext);
+      const operator = this.visitArithmeticOperation(ctx.getChild(1));
       return new ArithmeticNode(left, right, operator);
     }
+  }
 
-    else {
-      return this.visit(ctx.getChild(0));
+  visitBinaryLogicalOperation(operation: ParseTree): BinaryLogicalOperation {
+    switch (operation.text) {
+      case 'and': return BinaryLogicalOperation.AND;
+      case 'or': return BinaryLogicalOperation.OR;
+    }
+  }
+
+  visitUnaryLogicalOperation(operation: ParseTree): UnaryLogicalOperation {
+    switch (operation.text) {
+      case 'not': return UnaryLogicalOperation.NOT;
     }
   }
 }

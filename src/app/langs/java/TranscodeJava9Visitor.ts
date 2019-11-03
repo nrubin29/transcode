@@ -1,13 +1,17 @@
-import {Java9Visitor} from './Java9Visitor';
-import {ParseTree} from 'antlr4ts/tree';
-import {ArithmeticNode, AtomNode, ComparisonNode, FunctionCallNode, Node, RootNode} from '../../app/ast';
+import {Java9Visitor} from '../../../antlr/java/Java9Visitor';
+import {ArithmeticNode, BinaryLogicalOperation, ComparisonNode, FunctionCallNode, Node, RootNode, UnaryLogicalOperation} from '../ast';
 import {
-  AdditiveExpressionContext, EqualityExpressionContext,
+  AdditiveExpressionContext,
+  EqualityExpressionContext,
+  ExpressionStatementContext,
   IdentifierContext,
   LiteralContext,
-  MultiplicativeExpressionContext, RelationalExpressionContext, MethodInvocationContext, ExpressionStatementContext
-} from './Java9Parser';
+  MethodInvocationContext,
+  MultiplicativeExpressionContext,
+  RelationalExpressionContext
+} from '../../../antlr/java/Java9Parser';
 import {TranscodeVisitor} from '../transcode-visitor';
+import {ParseTree} from 'antlr4ts/tree';
 
 export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visitor<Node> {
 
@@ -25,7 +29,7 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
     if (ctx.childCount === 3) {
       const lhs = this.visit(ctx.additiveExpression());
       const rhs = this.visit(ctx.multiplicativeExpression());
-      const operator = this.visitAtom(ctx.getChild(1));
+      const operator = this.visitArithmeticOperation(ctx.getChild(1));
       return new ArithmeticNode(lhs, rhs, operator);
     }
   }
@@ -34,7 +38,7 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
     if (ctx.childCount === 3) {
       const lhs = this.visit(ctx.multiplicativeExpression());
       const rhs = this.visit(ctx.unaryExpression());
-      const operator = this.visitAtom(ctx.getChild(1));
+      const operator = this.visitArithmeticOperation(ctx.getChild(1));
       return new ArithmeticNode(lhs, rhs, operator);
     }
   }
@@ -43,7 +47,7 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
     if (ctx.childCount === 3) {
       const lhs = this.visit(ctx.equalityExpression());
       const rhs = this.visit(ctx.relationalExpression());
-      const operator = this.visitAtom(ctx.getChild(1));
+      const operator = this.visitComparisonOperation(ctx.getChild(1));
       return new ComparisonNode(lhs, rhs, operator);
     }
   }
@@ -53,7 +57,7 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
     if (ctx.childCount === 3) {
       const lhs = this.visit(ctx.relationalExpression());
       const rhs = this.visit(ctx.shiftExpression());
-      const operator = this.visitAtom(ctx.getChild(1));
+      const operator = this.visitComparisonOperation(ctx.getChild(1));
       return new ComparisonNode(lhs, rhs, operator);
     }
   }
@@ -64,5 +68,18 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
 
   visitLiteral(ctx: LiteralContext) {
     return this.visitAtom(ctx);
+  }
+
+  visitUnaryLogicalOperation(operation: ParseTree): UnaryLogicalOperation {
+    switch (operation.text) {
+      case '!': return UnaryLogicalOperation.NOT;
+    }
+  }
+
+  visitBinaryLogicalOperation(operation: ParseTree): BinaryLogicalOperation {
+    switch (operation.text) {
+      case '&&': return BinaryLogicalOperation.AND;
+      case '||': return BinaryLogicalOperation.OR;
+    }
   }
 }

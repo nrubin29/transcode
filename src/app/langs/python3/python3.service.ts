@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import {LanguageService} from './language-service';
+import {LanguageService} from '../language-service';
 import {Ast, RootNode} from '../ast';
 import {CharStreams, CommonTokenStream} from 'antlr4ts';
-import {Python3Lexer} from '../../antlr/python3/Python3Lexer';
-import {File_inputContext, Python3Parser} from '../../antlr/python3/Python3Parser';
-import {TranscodePython3Visitor} from '../../antlr/python3/TranscodePython3Visitor';
+import {Python3Lexer} from '../../../antlr/python3/Python3Lexer';
+import {File_inputContext, Python3Parser} from '../../../antlr/python3/Python3Parser';
+import {TranscodePython3Visitor} from './TranscodePython3Visitor';
 
 @Injectable({
   providedIn: 'root'

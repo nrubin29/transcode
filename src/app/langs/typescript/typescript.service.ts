@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import {LanguageService} from './language-service';
+import {LanguageService} from '../language-service';
 import {Ast, RootNode} from '../ast';
-import {ProgramContext, TypeScriptParser} from '../../antlr/typescript/TypeScriptParser';
+import {ProgramContext, TypeScriptParser} from '../../../antlr/typescript/TypeScriptParser';
 import {CharStreams, CommonTokenStream} from 'antlr4ts';
-import {TypeScriptLexer} from '../../antlr/typescript/TypeScriptLexer';
-import {TranscodeTypeScriptVisitor} from '../../antlr/typescript/TranscodeTypeScriptVisitor';
+import {TypeScriptLexer} from '../../../antlr/typescript/TypeScriptLexer';
+import {TranscodeTypeScriptVisitor} from './TranscodeTypeScriptVisitor';
 
 @Injectable({
   providedIn: 'root'

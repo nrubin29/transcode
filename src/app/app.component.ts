@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {Python3Service} from './services/python3.service';
-import {JavaService} from './services/java.service';
-import {TypescriptService} from './services/typescript.service';
+import {Python3Service} from './langs/python3/python3.service';
+import {JavaService} from './langs/java/java.service';
+import {TypescriptService} from './langs/typescript/typescript.service';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +27,7 @@ export class AppComponent implements OnInit {
 
     console.log('Java:');
     console.log(javaAst);
+    console.log(this.java.convertAstToCode(javaAst));
     console.log();
 
     console.log('TypeScript:');
