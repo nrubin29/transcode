@@ -17,7 +17,7 @@ import {
   ElseStatementNode,
   BooleanNode,
   StringNode,
-  PrintNode, InputNode, IntConversionNode, ElseIfStatementNode, StatementNode
+  PrintNode, InputNode, IntConversionNode, ElseIfStatementNode, StatementNode, ForLoopNode
 } from '../ast';
 import {
   ArglistContext,
@@ -34,10 +34,12 @@ import {
   Not_testContext,
   ComparisonContext,
   If_stmtContext,
+  For_stmtContext,
 } from '../../../antlr/python3/Python3Parser';
 import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree} from 'antlr4ts/tree';
 import {Statement} from '@angular/compiler';
+import {range} from 'rxjs';
 
 export class TranscodePython3Visitor extends TranscodeVisitor implements Python3Visitor<Node> {
 
@@ -189,6 +191,27 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       else {
         return new IfStatementNode(ifCondition as ExpressionNode, ifStatement, elseIfs);
       }
+    }
+  }
+
+  visitFor_stmt(ctx: For_stmtContext) {
+    if (ctx.childCount === 6) {
+      let start: ExpressionNode = new AtomNode('0');
+      let stop: ExpressionNode;
+      let step: ExpressionNode = new AtomNode('1');
+      let forStatements: StatementNode[] = [];
+      const controlVariable = this.visit(ctx.getChild(1));
+      const rangeNode: FunctionCallNode = this.visit(ctx.getChild(3)) as FunctionCallNode;
+      if (rangeNode.args.length === 1) {
+        stop = rangeNode.args[0];
+      }
+      else {
+        start = rangeNode.args[0];
+        stop = rangeNode.args[1];
+        step = rangeNode.args.length === 3 ? rangeNode.args[2] : new AtomNode('1');
+      }
+      ctx.suite(0).stmt().map(item => forStatements.push(this.visit(item) as StatementNode));
+      return new ForLoopNode(controlVariable as AtomNode, start, stop, step, forStatements);
     }
   }
 }
