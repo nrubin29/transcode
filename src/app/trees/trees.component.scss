@@ -1,0 +1,17 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  & ::ng-deep {
+    & .mat-dialog-content {
+      // display: flex;
+      flex: 1;
+      max-height: revert;
+    }
+
+    & .mat-tab-body-wrapper {
+      overflow: scroll;
+    }
+  }
+}

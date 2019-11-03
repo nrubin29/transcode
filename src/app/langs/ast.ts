@@ -1,9 +1,9 @@
 export enum ArithmeticOperation {
-  ADDITION = 'ADDITION',
-  SUBTRACTION = 'SUBTRACTION',
-  MULTIPLICATION = 'MULTIPLICATION',
-  DIVISION = 'DIVISION',
-  MODULUS = 'MODULUS'
+  ADDITION = '+',
+  SUBTRACTION = '-',
+  MULTIPLICATION = '*',
+  DIVISION = '/',
+  MODULUS = '%'
 }
 
 export enum UnaryLogicalOperation {
