@@ -99,7 +99,8 @@ export class AppComponent implements OnInit {
 
   showTrees() {
     this.dialog.open(TreesComponent, {
-      width: '1024px',
+      width: '100vw',
+      height: '100vh',
       data: {
         antlrTree: this.antlrTree,
         ast: this.ast

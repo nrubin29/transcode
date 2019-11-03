@@ -87,7 +87,7 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => this.visit(statement)) + '\n' + this.indentation(ifStatement.depth) + '}' + (ifStatement.elseIfs.length > 0 ? '\n\n' : '') + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n\n') + (ifStatement.els ? '\n\n' + this.visit(ifStatement.els) : '');
+    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(ifStatement.depth) + '}' + (ifStatement.elseIfs.length > 0 ? '\n\n' : '') + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n\n') + (ifStatement.els ? '\n\n' + this.visit(ifStatement.els) : '');
   }
 
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {

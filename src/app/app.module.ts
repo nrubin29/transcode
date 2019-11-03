@@ -9,7 +9,7 @@ import {
   MatDialogModule,
   MatFormFieldModule,
   MatIconModule,
-  MatSelectModule,
+  MatSelectModule, MatTabsModule,
   MatToolbarModule
 } from '@angular/material';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -33,7 +33,8 @@ import { GifComponent } from './gif/gif.component';
     MatButtonModule,
     MatDialogModule,
     MatIconModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatTabsModule
   ],
   providers: [],
   entryComponents: [

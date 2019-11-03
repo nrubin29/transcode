@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Trees</h1>
+<div mat-dialog-content>
+  <mat-tab-group (selectedTabChange)="tabChange($event)">
+    <mat-tab label="Language-specific tree">
+      <div id="antlr-tree"></div>
+    </mat-tab>
+    <mat-tab label="Language-agnostic tree">
+      <div id="ast-tree"></div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
