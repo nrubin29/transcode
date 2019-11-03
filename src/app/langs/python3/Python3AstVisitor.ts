@@ -1,13 +1,13 @@
 import {AstVisitor} from '../ast-visitor';
 import {
-  ArithmeticNode,
+  ArithmeticNode, ArrayAccessNode,
   AssignmentNode,
   BinaryLogicalNode,
   BinaryLogicalOperation,
-  ComparisonNode,
-  FunctionCallNode,
+  ComparisonNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
+  FunctionCallNode, IfStatementNode,
   UnaryLogicalNode,
-  UnaryLogicalOperation
+  UnaryLogicalOperation, WhileLoopNode
 } from '../ast';
 
 export class Python3AstVisitor extends AstVisitor {
@@ -41,6 +41,34 @@ export class Python3AstVisitor extends AstVisitor {
   }
 
   visitUnaryLogicalOperation(operation: UnaryLogicalOperation): string {
+    return '';
+  }
+
+  visitArrayAccessNode(arrayAccess: ArrayAccessNode): string {
+    return '';
+  }
+
+  visitDotAccessNode(dotAccess: DotAccessNode): string {
+    return '';
+  }
+
+  visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
+    return '';
+  }
+
+  visitElseStatementNode(elseStatement: ElseStatementNode): string {
+    return '';
+  }
+
+  visitForLoopNode(forLoopNode: ForLoopNode): string {
+    return '';
+  }
+
+  visitIfStatementNode(ifStatement: IfStatementNode): string {
+    return '';
+  }
+
+  visitWhileLoopNode(whileLoop: WhileLoopNode): string {
     return '';
   }
 }

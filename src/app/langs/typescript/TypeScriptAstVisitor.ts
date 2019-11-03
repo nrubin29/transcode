@@ -1,16 +1,43 @@
 import {AstVisitor} from '../ast-visitor';
 import {
-  ArithmeticNode,
+  ArithmeticNode, ArrayAccessNode,
   AssignmentNode,
   BinaryLogicalNode,
   BinaryLogicalOperation,
-  ComparisonNode,
-  FunctionCallNode,
+  ComparisonNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
+  FunctionCallNode, IfStatementNode,
   UnaryLogicalNode,
-  UnaryLogicalOperation
+  UnaryLogicalOperation, WhileLoopNode
 } from '../ast';
 
 export class TypeScriptAstVisitor extends AstVisitor {
+  visitArrayAccessNode(arrayAccess: ArrayAccessNode): string {
+    return '';
+  }
+
+  visitDotAccessNode(dotAccess: DotAccessNode): string {
+    return '';
+  }
+
+  visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
+    return '';
+  }
+
+  visitElseStatementNode(elseStatement: ElseStatementNode): string {
+    return '';
+  }
+
+  visitForLoopNode(forLoopNode: ForLoopNode): string {
+    return '';
+  }
+
+  visitIfStatementNode(ifStatement: IfStatementNode): string {
+    return '';
+  }
+
+  visitWhileLoopNode(whileLoop: WhileLoopNode): string {
+    return '';
+  }
 
   visitArithmeticNode(arithmetic: ArithmeticNode): string {
     return '';
