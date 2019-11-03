@@ -94,7 +94,7 @@ export class AppComponent implements OnInit {
       this.ast = this.sourceLanguage.service.convertAntlrToAst(this.antlrTree);
       this.target.writeValue(this.targetLanguage.service.convertAstToCode(this.ast));
       ref.close();
-    }, 0);
+    }, 1500);
   }
 
   showTrees() {

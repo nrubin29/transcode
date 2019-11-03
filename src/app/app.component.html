@@ -24,7 +24,7 @@
       <app-codemirror #target [config]="{mode: targetLanguage.mode, readOnly: true}"></app-codemirror>
     </div>
   </div>
-  <div class="flex display-side" style="margin-top: 1em">
+  <div class="flex display-side" style="margin: 1em 0">
     <div>
       <button mat-raised-button color="primary" (click)="showTrees()" [disabled]="!antlrTree || !ast">Show trees</button>
     </div>
@@ -32,4 +32,22 @@
       <button mat-raised-button color="primary" (click)="translate()">Translate Code</button>
     </div>
   </div>
+  <mat-card class="mat-elevation-z8">
+    <mat-card-header>Supported language features</mat-card-header>
+    <mat-card-content>
+      <mat-grid-list cols="4" rowHeight="100px">
+        <mat-grid-tile [colspan]="1" [rowspan]="1">Logical operators (and, or, not)</mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">Comparison operators (equals, not equals, etc.)</mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">Arithmetic (addition, subtraction, multiplication, division, modulus)</mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">Variable declaration and assignment</mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">If statements (if, else if, else)</mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">For loops</mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">Function calls (including dot access)</mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">Print statements</mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">User input</mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">Conversion to integer</mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">Basic type inference</mat-grid-tile>
+      </mat-grid-list>
+    </mat-card-content>
+  </mat-card>
 </div>

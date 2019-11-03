@@ -5,9 +5,9 @@ import { AppComponent } from './app.component';
 import {CodemirrorComponent} from './codemirror/codemirror.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
-  MatButtonModule,
+  MatButtonModule, MatCardModule,
   MatDialogModule,
-  MatFormFieldModule,
+  MatFormFieldModule, MatGridListModule,
   MatIconModule,
   MatSelectModule, MatTabsModule,
   MatToolbarModule
@@ -34,7 +34,9 @@ import { GifComponent } from './gif/gif.component';
     MatDialogModule,
     MatIconModule,
     MatToolbarModule,
-    MatTabsModule
+    MatTabsModule,
+    MatCardModule,
+    MatGridListModule
   ],
   providers: [],
   entryComponents: [
