@@ -50,7 +50,7 @@ export class TypeScriptAstVisitor extends StringAstVisitor {
   }
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
-    return 'for (' + this.visitType(forLoopNode.start.type) + ' ' + this.visit(forLoopNode.controlVariable) + ' = ' + this.visit(forLoopNode.start) + '; ' + this.visit(forLoopNode.controlVariable) + ' < ' + this.visit(forLoopNode.stop) + '; ' + this.visit(forLoopNode.controlVariable) + ' += ' + this.visit(forLoopNode.step) + ') {\n' + forLoopNode.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(forLoopNode.depth) + '}';
+    return 'for ( let ' + this.visit(forLoopNode.controlVariable) + ' = ' + this.visit(forLoopNode.start) + '; ' + this.visit(forLoopNode.controlVariable) + ' < ' + this.visit(forLoopNode.stop) + '; ' + this.visit(forLoopNode.controlVariable) + ' += ' + this.visit(forLoopNode.step) + ') {\n' + forLoopNode.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(forLoopNode.depth) + '}';
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
