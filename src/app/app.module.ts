@@ -10,8 +10,7 @@ import {
   MatFormFieldModule,
   MatIconModule,
   MatSelectModule,
-  MatToolbarModule,
-  MatTreeModule
+  MatToolbarModule
 } from '@angular/material';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { TreesComponent } from './trees/trees.component';
@@ -32,7 +31,6 @@ import { GifComponent } from './gif/gif.component';
     MatFormFieldModule,
     MatSelectModule,
     MatButtonModule,
-    MatTreeModule,
     MatDialogModule,
     MatIconModule,
     MatToolbarModule
