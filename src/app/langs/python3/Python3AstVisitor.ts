@@ -62,23 +62,23 @@ export class Python3AstVisitor extends StringAstVisitor {
 
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
     return 'elif ' + this.visit(elseIfStatement.condition) + ':\n'
-      + elseIfStatement.statements.map(child => '  ' + this.visit(child)).join('\n');
+      + elseIfStatement.statements.map(child => this.visit(child)).join('\n');
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
-    return 'else:\n' + elseStatement.statements.map(child => '  ' + this.visit(child)).join('\n');
+    return 'else:\n' + elseStatement.statements.map(child => this.indentation(elseStatement.depth) + this.visit(child)).join('\n');
   }
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
     return 'for ' + forLoopNode.controlVariable.atom + ' in range(' + (this.visit(forLoopNode.start) ? this.visit(forLoopNode.start) + ', ' : '')
       + this.visit(forLoopNode.stop) + (this.visit(forLoopNode.step) === '1' ? '' : ', ' + this.visit(forLoopNode.step)) + '):'
-      + '\n' + forLoopNode.statements.map(child => '  ' + this.visit(child)).join('\n');
+      + '\n' + forLoopNode.statements.map(child => this.visit(child)).join('\n');
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
     return 'if ' + this.visit(ifStatement.condition) + ':\n' + ifStatement.statements.map(child => '  ' + this.visit(child)).join('\n')
-       + '\n' + (ifStatement.elseIfs ? ifStatement.elseIfs.map(elseIfBlock => this.visitElseIfStatementNode(elseIfBlock)).join('\n') : '')
-        + '\n' + (ifStatement.els ? this.visitElseStatementNode(ifStatement.els) : '');
+       + '\n' + (ifStatement.elseIfs ? ifStatement.elseIfs.map(elseIfBlock => this.visit(elseIfBlock)).join('\n') : '')
+        + '\n' + (ifStatement.els ? this.visit(ifStatement.els) : '');
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
