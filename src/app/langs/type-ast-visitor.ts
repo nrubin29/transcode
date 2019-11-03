@@ -135,7 +135,7 @@ export class TypeAstVisitor extends AstVisitor<void> {
 
   visitFunctionCallNode(functionCall: FunctionCallNode): void {
     this.visit(functionCall.func);
-    this.visit(functionCall.args);
+    functionCall.args.forEach(arg => this.visit(arg));
 
     // TODO: Can hard-code some functions for some languages (print, input).
     functionCall.type = {type: PrimitiveType.OBJECT, isArray: false};
