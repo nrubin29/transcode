@@ -6,7 +6,7 @@ import {
   BinaryLogicalNode,
   BinaryLogicalOperation,
   BooleanNode,
-  ComparisonNode,
+  ComparisonNode, DeclarationNode,
   DotAccessNode,
   ElseIfStatementNode,
   ElseStatementNode,
@@ -67,7 +67,11 @@ export class TypeScriptAstVisitor extends StringAstVisitor {
   }
 
   visitAssignmentNode(assignment: AssignmentNode): string {
-    return 'let ' + this.visit(assignment.name) + ' = ' + this.visit(assignment.value) + ';';
+    return this.visit(assignment.name) + ' = ' + this.visit(assignment.value) + ';';
+  }
+
+  visitDeclarationNode(declaration: DeclarationNode): string {
+    return 'let ' + this.visit(declaration.name) + ': ' + this.visitType(declaration.value.type) + ' = ' + this.visit(declaration.value) + ';';
   }
 
   visitBinaryLogicalNode(logic: BinaryLogicalNode): string {

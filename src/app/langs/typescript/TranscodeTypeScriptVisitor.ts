@@ -5,7 +5,7 @@ import {
   AtomNode,
   BinaryLogicalNode,
   BinaryLogicalOperation,
-  ComparisonNode,
+  ComparisonNode, DeclarationNode,
   DotAccessNode, ElseIfStatementNode, ElseStatementNode,
   ExpressionNode,
   FunctionCallNode, IfStatementNode,
@@ -57,7 +57,12 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
 
   visitVariableStatement(ctx: VariableStatementContext) {
     if (ctx.variableDeclarationList()) {
-      return this.visit(ctx.variableDeclarationList());
+      const assign = this.visit(ctx.variableDeclarationList()) as AssignmentNode;
+      if (ctx.varModifier()) {
+        return new DeclarationNode(assign.name, assign.value);
+      } else {
+        return assign;
+      }
     }
   }
 
