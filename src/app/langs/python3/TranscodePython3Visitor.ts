@@ -7,7 +7,7 @@ import {
   RootNode,
   UnaryLogicalOperation,
   ExpressionNode,
-  AssignmentNode, AtomNode, BinaryLogicalNode, UnaryLogicalNode
+  AssignmentNode, AtomNode, BinaryLogicalNode, UnaryLogicalNode, ComparisonNode
 } from '../ast';
 import {
   ArglistContext,
@@ -21,6 +21,7 @@ import {
   Or_testContext,
   And_testContext,
   Not_testContext,
+  ComparisonContext,
 } from '../../../antlr/python3/Python3Parser';
 import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree} from 'antlr4ts/tree';
@@ -71,7 +72,6 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
     }
   }
 
-
   visitExpr_stmt(ctx: Expr_stmtContext) {
     if (ctx.childCount === 3) {
       // Should be of type AtomNode
@@ -105,6 +105,15 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       const right = this.visit(ctx.not_test());
       const operator = this.visitUnaryLogicalOperation(ctx.getChild(0));
       return new UnaryLogicalNode(right, operator);
+    }
+  }
+
+  visitComparison(ctx: ComparisonContext) {
+    if (ctx.childCount === 3) {
+      const left = this.visit(ctx.star_expr(0));
+      const right = this.visit(ctx.star_expr(1));
+      const operator = this.visitComparisonOperation(ctx.comp_op(0));
+      return new ComparisonNode(left, right, operator);
     }
   }
 
