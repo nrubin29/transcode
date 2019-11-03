@@ -54,6 +54,10 @@ export abstract class ExpressionNode extends Node {
   // protected constructor() { super(); }
 }
 
+export class DeclarationNode extends Node {
+  constructor(public name: AtomNode, public value: ExpressionNode) { super(); }
+}
+
 export class AssignmentNode extends Node {
   constructor(public name: AtomNode, public value: ExpressionNode) { super(); }
 }

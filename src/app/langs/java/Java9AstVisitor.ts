@@ -4,7 +4,7 @@ import {
   AssignmentNode,
   BinaryLogicalNode,
   BinaryLogicalOperation, BooleanNode,
-  ComparisonNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
+  ComparisonNode, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
   FunctionCallNode, IfStatementNode, PrimitiveType, StringNode, Type,
   UnaryLogicalNode,
   UnaryLogicalOperation, WhileLoopNode
@@ -21,7 +21,7 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitAssignmentNode(assignment: AssignmentNode): string {
-    return this.visitType(assignment.value.type) + ' ' + this.visit(assignment.name) + ' = ' + this.visit(assignment.value) + ';';
+    return this.visit(assignment.name) + ' = ' + this.visit(assignment.value) + ';';
   }
 
   visitBinaryLogicalNode(logic: BinaryLogicalNode): string {
@@ -30,6 +30,10 @@ export class Java9AstVisitor extends StringAstVisitor {
 
   visitComparisonNode(comparison: ComparisonNode): string {
     return this.visit(comparison.left) + ' ' + this.visitComparisonOperation(comparison.operation) + ' ' + this.visit(comparison.right);
+  }
+
+  visitDeclarationNode(declaration: DeclarationNode): string {
+    return this.visitType(declaration.value.type) + ' ' + this.visit(declaration.name) + ' = ' + this.visit(declaration.value) + ';';
   }
 
   visitUnaryLogicalNode(logic: UnaryLogicalNode): string {

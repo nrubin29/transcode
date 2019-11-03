@@ -6,7 +6,7 @@ import {
   BinaryLogicalNode,
   BinaryLogicalOperation, BooleanNode,
   ComparisonNode,
-  ComparisonOperation, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
+  ComparisonOperation, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
   FunctionCallNode, IfStatementNode,
   Node,
   RootNode, StringNode, Type,
@@ -45,7 +45,9 @@ export abstract class AstVisitor<T> {
   abstract visitAtomNode(atom: AtomNode): T;
   abstract visitBooleanNode(bool: BooleanNode): T;
   abstract visitStringNode(str: StringNode): T;
+  abstract visitDeclarationNode(declaration: DeclarationNode): T;
   abstract visitAssignmentNode(assignment: AssignmentNode): T;
+
   abstract visitArithmeticNode(arithmetic: ArithmeticNode): T;
   abstract visitUnaryLogicalNode(logic: UnaryLogicalNode): T;
   abstract visitBinaryLogicalNode(logic: BinaryLogicalNode): T;

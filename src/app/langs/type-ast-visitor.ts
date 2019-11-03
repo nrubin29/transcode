@@ -8,7 +8,7 @@ import {
   BinaryLogicalOperation,
   BooleanNode,
   ComparisonNode,
-  ComparisonOperation,
+  ComparisonOperation, DeclarationNode,
   DotAccessNode,
   ElseIfStatementNode,
   ElseStatementNode,
@@ -56,6 +56,15 @@ export class TypeAstVisitor extends AstVisitor<void> {
   visitArrayAccessNode(arrayAccess: ArrayAccessNode): void {
     this.visit(arrayAccess.array);
     this.visit(arrayAccess.index);
+  }
+
+  visitDeclarationNode(declaration: DeclarationNode): void {
+    this.visit(declaration.name);
+    this.visit(declaration.value);
+
+    declaration.name.type = {...declaration.value.type};
+    this.vars[declaration.name.atom] = {...declaration.name.type};
+    console.log('updated type of', declaration.name.atom, 'to', declaration.name.type);
   }
 
   visitAssignmentNode(assignment: AssignmentNode): void {
@@ -135,7 +144,7 @@ export class TypeAstVisitor extends AstVisitor<void> {
 
   visitFunctionCallNode(functionCall: FunctionCallNode): void {
     this.visit(functionCall.func);
-    this.visit(functionCall.args);
+    functionCall.args.forEach(arg => this.visit(arg));
 
     // TODO: Can hard-code some functions for some languages (print, input).
     functionCall.type = {type: PrimitiveType.OBJECT, isArray: false};
