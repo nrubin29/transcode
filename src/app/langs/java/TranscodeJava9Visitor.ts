@@ -1,23 +1,47 @@
 import {Java9Visitor} from '../../../antlr/java/Java9Visitor';
 import {
-  ArithmeticNode, AssignmentNode, AtomNode,
-  BinaryLogicalOperation, BooleanNode,
-  ComparisonNode, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode,
-  ExpressionNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode,
-  Node, PrintNode,
-  RootNode, StatementNode, StringNode,
+  ArithmeticNode,
+  AssignmentNode,
+  AtomNode,
+  BinaryLogicalNode,
+  BinaryLogicalOperation,
+  BooleanNode,
+  ComparisonNode,
+  DeclarationNode,
+  DotAccessNode,
+  ElseIfStatementNode,
+  ElseStatementNode,
+  ExpressionNode,
+  ForLoopNode,
+  FunctionCallNode,
+  IfStatementNode,
+  InputNode,
+  IntConversionNode,
+  Node,
+  PrintNode,
+  RootNode,
+  StatementNode,
+  StringNode,
   UnaryLogicalOperation
 } from '../ast';
 import {
-  AdditiveExpressionContext, AssignmentContext, BlockContext, BlockStatementsContext,
-  IfThenElseStatementContext, IfThenStatementContext,
-  MethodInvocation_lfno_primaryContext,
+  AdditiveExpressionContext,
+  AssignmentContext,
+  BasicForStatementContext,
+  BlockContext,
+  BlockStatementContext,
+  BlockStatementsContext,
+  ConditionalAndExpressionContext, ConditionalOrExpressionContext,
   EqualityExpressionContext,
+  IfThenElseStatementContext,
+  IfThenStatementContext,
   LocalVariableDeclarationContext,
+  MethodInvocation_lfno_primaryContext,
   MethodInvocationContext,
   MultiplicativeExpressionContext,
-  RelationalExpressionContext, StatementContext, TypeNameContext, VariableDeclaratorContext, BlockStatementContext, BasicForStatementContext
+  RelationalExpressionContext,
+  TypeNameContext,
+  VariableDeclaratorContext
 } from '../../../antlr/java/Java9Parser';
 import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree} from 'antlr4ts/tree';
@@ -170,6 +194,22 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
       const rhs = this.visit(ctx.shiftExpression());
       const operator = this.visitComparisonOperation(ctx.getChild(1));
       return new ComparisonNode(lhs as ExpressionNode, rhs as ExpressionNode, operator);
+    }
+  }
+
+  visitConditionalAndExpression(ctx: ConditionalAndExpressionContext) {
+    if (ctx.childCount === 3) {
+      const left = this.visit(ctx.conditionalAndExpression());
+      const right = this.visit(ctx.inclusiveOrExpression());
+      return new BinaryLogicalNode(left as ExpressionNode, right as ExpressionNode, BinaryLogicalOperation.AND);
+    }
+  }
+
+  visitConditionalOrExpression(ctx: ConditionalOrExpressionContext) {
+    if (ctx.childCount === 3) {
+      const left = this.visit(ctx.conditionalOrExpression());
+      const right = this.visit(ctx.conditionalAndExpression());
+      return new BinaryLogicalNode(left as ExpressionNode, right as ExpressionNode, BinaryLogicalOperation.OR);
     }
   }
 
