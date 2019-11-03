@@ -23,6 +23,8 @@ import {
 import {log} from 'util';
 
 export class TypeScriptAstVisitor extends StringAstVisitor {
+  variablesSeen = new Set<string>();
+
   visitArrayAccessNode(arrayAccess: ArrayAccessNode): string {
     return this.visit(arrayAccess.array) + '[' + this.visit(arrayAccess.index) + ']';
   }
@@ -67,7 +69,13 @@ export class TypeScriptAstVisitor extends StringAstVisitor {
   }
 
   visitAssignmentNode(assignment: AssignmentNode): string {
-    return this.visit(assignment.name) + ' = ' + this.visit(assignment.value) + ';';
+    if (this.variablesSeen.has(assignment.name.atom)) {
+      return this.visit(assignment.name) + ' = ' + this.visit(assignment.value) + ';';
+    } else {
+      // This is a hack because Python can't differentiate between assignments and declarations.
+      this.variablesSeen.add(assignment.name.atom);
+      return this.visitDeclarationNode(new DeclarationNode(assignment.name, assignment.value));
+    }
   }
 
   visitDeclarationNode(declaration: DeclarationNode): string {
