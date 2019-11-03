@@ -97,15 +97,15 @@ export class AppComponent implements OnInit {
     }, 0);
   }
 
-  // showTrees() {
-  //   this.dialog.open(TreesComponent, {
-  //     width: '1024px',
-  //     data: {
-  //       antlrTree: this.antlrTree,
-  //       ast: this.ast
-  //     }
-  //   });
-  // }
+  showTrees() {
+    this.dialog.open(TreesComponent, {
+      width: '1024px',
+      data: {
+        antlrTree: this.antlrTree,
+        ast: this.ast
+      }
+    });
+  }
 }
 
 interface LanguageInfo {
