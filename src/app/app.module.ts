@@ -8,20 +8,22 @@ import {
   MatButtonModule, MatCardModule,
   MatDialogModule,
   MatFormFieldModule, MatGridListModule,
-  MatIconModule,
+  MatIconModule, MatListModule,
   MatSelectModule, MatTabsModule,
   MatToolbarModule
 } from '@angular/material';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { TreesComponent } from './trees/trees.component';
 import { GifComponent } from './gif/gif.component';
+import { AboutComponent } from './about/about.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     CodemirrorComponent,
     TreesComponent,
-    GifComponent
+    GifComponent,
+    AboutComponent
   ],
   imports: [
     BrowserModule,
@@ -36,12 +38,14 @@ import { GifComponent } from './gif/gif.component';
     MatToolbarModule,
     MatTabsModule,
     MatCardModule,
-    MatGridListModule
+    MatGridListModule,
+    MatListModule
   ],
   providers: [],
   entryComponents: [
     GifComponent,
-    TreesComponent
+    TreesComponent,
+    AboutComponent
   ],
   bootstrap: [AppComponent]
 })

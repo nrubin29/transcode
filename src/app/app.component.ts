@@ -9,6 +9,7 @@ import {Ast} from './langs/ast';
 import {MatDialog} from '@angular/material';
 import {TreesComponent} from './trees/trees.component';
 import {GifComponent} from './gif/gif.component';
+import {AboutComponent} from './about/about.component';
 
 @Component({
   selector: 'app-root',
@@ -106,6 +107,10 @@ export class AppComponent implements OnInit {
         ast: this.ast
       }
     });
+  }
+
+  about() {
+    this.dialog.open(AboutComponent);
   }
 }
 
