@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, View
 import * as CodeMirror from 'codemirror';
 import 'codemirror/mode/python/python';
 import 'codemirror/mode/clike/clike';
+import 'codemirror/mode/javascript/javascript';
 import { EditorConfiguration, EditorFromTextArea } from 'codemirror';
 
 @Component({
