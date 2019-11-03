@@ -11,6 +11,7 @@ import {
 } from '../ast';
 
 export class Java9AstVisitor extends StringAstVisitor {
+  variablesSeen = new Set<string>();
 
   visitFunctionCallNode(functionCall: FunctionCallNode): string {
     return this.visit(functionCall.func) + '(' + functionCall.args.map(child => this.visit(child)).join(', ') + ');';
@@ -21,7 +22,15 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitAssignmentNode(assignment: AssignmentNode): string {
-    return this.visit(assignment.name) + ' = ' + this.visit(assignment.value) + ';';
+    if (this.variablesSeen.has(assignment.name.atom)) {
+      return this.visit(assignment.name) + ' = ' + this.visit(assignment.value) + ';';
+    }
+
+    else {
+      // This is a hack because Python can't differentiate between assignments and declarations.
+      this.variablesSeen.add(assignment.name.atom);
+      return this.visitDeclarationNode(new DeclarationNode(assignment.name, assignment.value));
+    }
   }
 
   visitBinaryLogicalNode(logic: BinaryLogicalNode): string {
