@@ -86,8 +86,12 @@ export class Java9AstVisitor extends StringAstVisitor {
     return this.visit(dotAccess.left)  + '.' + this.visit(dotAccess.right);
   }
 
+  visitIfStatementNode(ifStatement: IfStatementNode): string {
+    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n} ' + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n') + (ifStatement.els ? this.visit(ifStatement.els) : '');
+  }
+
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
-    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' + elseIfStatement.statements.map(statement => '  ' + this.visit(statement)).join('\n') + '\n}';
+    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' + elseIfStatement.statements.map(statement => '  ' + this.visit(statement)).join('\n') + '\n} ';
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
@@ -96,10 +100,6 @@ export class Java9AstVisitor extends StringAstVisitor {
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
     return 'for (' + this.visitType(forLoopNode.start.type) + ' ' + this.visit(forLoopNode.controlVariable) + ' = ' + this.visit(forLoopNode.start) + '; ' + this.visit(forLoopNode.controlVariable) + ' < ' + this.visit(forLoopNode.stop) + '; ' + this.visit(forLoopNode.controlVariable) + ' += ' + this.visit(forLoopNode.step) + ' {' + forLoopNode.statements.map(statement => '\t' + this.visit(statement)) + '}';
-  }
-
-  visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n}' + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n') + '\n' + (ifStatement.els ? this.visit(ifStatement.els) : '');
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
