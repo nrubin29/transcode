@@ -50,31 +50,31 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitArrayAccessNode(arrayAccess: ArrayAccessNode): string {
-    return '';
+    return this.visit(arrayAccess.array)  + '[' + this.visit(arrayAccess.index) + ']';
   }
 
   visitDotAccessNode(dotAccess: DotAccessNode): string {
-    return '';
+    return this.visit(dotAccess.left)  + '.' + this.visit(dotAccess.right);
   }
 
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
-    return '';
+    return 'else if (' + this.visit(elseIfStatement.condition) + ') {' + elseIfStatement.statements.map(statement => '\t' + this.visit(statement)).join('\n') + '}';
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
-    return '';
+    return 'else {' + elseStatement.statements.map(statement => '\t' + this.visit(statement)) + '}';
   }
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
-    return '';
+    return 'for (' + this.visitType(forLoopNode.start.type) + ' ' + this.visit(forLoopNode.controlVariable) + ' = ' + this.visit(forLoopNode.start) + '; ' + this.visit(forLoopNode.controlVariable) + ' < ' + this.visit(forLoopNode.stop) + '; ' + this.visit(forLoopNode.controlVariable) + ' += ' + this.visit(forLoopNode.step) + ' {' + forLoopNode.statements.map(statement => '\t' + this.visit(statement)) + '}';
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return '';
+    return 'if (' + this.visit(ifStatement.condition) + ') {' + ifStatement.statements.map(statement => '\t' + this.visit(statement)) + '}' + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n') + (ifStatement.els ? this.visit(ifStatement.els) : '');
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
-    return '';
+    return 'while (' + this.visit(whileLoop.condition) + ') {' + whileLoop.statements.map(statement => '\t' + this.visit(statement)).join('\n') + '}';
   }
 
   visitBooleanNode(bool: BooleanNode): string {
