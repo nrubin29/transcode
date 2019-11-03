@@ -111,7 +111,7 @@ export class ForLoopNode extends Node {
 }
 
 export class PrintNode extends Node {
-  constructor(public arg?: ExpressionNode) { super(); }
+  constructor(public args: ExpressionNode[]) { super(); }
 }
 
 export class InputNode extends ExpressionNode {

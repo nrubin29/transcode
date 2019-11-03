@@ -27,8 +27,8 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
   }
 
   visitMethodInvocation(ctx: MethodInvocationContext) {
-    let identifier;
-    let args;
+    let identifier: Node;
+    let args: Node[];
 
     if (ctx.typeName()) {
       identifier = new DotAccessNode(this.visit(ctx.typeName()) as ExpressionNode, this.visit(ctx.identifier()) as AtomNode);
@@ -54,7 +54,7 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
       identifier.left.right.atom === 'out' &&
       identifier.right instanceof AtomNode &&
       identifier.right.atom === 'println') {
-      return new PrintNode(args.length > 0 ? args[0] as ExpressionNode : undefined);
+      return new PrintNode(args as ExpressionNode[]);
     }
 
     else if (identifier instanceof DotAccessNode &&
@@ -73,7 +73,7 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
       return new IntConversionNode(args[0] as ExpressionNode);
     }
 
-    return new FunctionCallNode(identifier, args as ExpressionNode[]);
+    return new FunctionCallNode(identifier as ExpressionNode, args as ExpressionNode[]);
   }
 
   visitTypeName(ctx: TypeNameContext) {

@@ -120,7 +120,13 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitPrintNode(print: PrintNode): string {
-    return 'System.out.println(' + this.visit(print.arg) + ');';
+    if (print.args.length === 0) {
+      return 'System.out.println();';
+    }
+
+    else {
+      return print.args.map(pr => 'System.out.println(' + this.visit(pr) + ');').join('\n');
+    }
   }
 
   visitType(type: Type): string {
