@@ -66,7 +66,7 @@ export class Python3AstVisitor extends StringAstVisitor {
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
-    return 'else:\n' + elseStatement.statements.map(child => this.indentation(elseStatement.depth) + this.visit(child)).join('\n');
+    return 'else:\n' + elseStatement.statements.map(child => this.visit(child)).join('\n');
   }
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
