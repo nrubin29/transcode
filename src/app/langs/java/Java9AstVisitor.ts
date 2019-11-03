@@ -5,13 +5,24 @@ import {
   BinaryLogicalNode,
   BinaryLogicalOperation, BooleanNode,
   ComparisonNode, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode, PrimitiveType, StringNode, Type,
+  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, PrimitiveType, PrintNode, RootNode, StringNode, Type,
   UnaryLogicalNode,
   UnaryLogicalOperation, WhileLoopNode
 } from '../ast';
 
 export class Java9AstVisitor extends StringAstVisitor {
   variablesSeen = new Set<string>();
+  hasInput = false;
+
+  visitRootNode(root: RootNode): string {
+    let val = super.visitRootNode(root);
+
+    if (this.hasInput) {
+      val = 'import java.util.Scanner;\n\nScanner s = new Scanner(System.in);\n' + val;
+    }
+
+    return val;
+  }
 
   visitFunctionCallNode(functionCall: FunctionCallNode): string {
     return this.visit(functionCall.func) + '(' + functionCall.args.map(child => this.visit(child)).join(', ') + ');';
@@ -97,6 +108,19 @@ export class Java9AstVisitor extends StringAstVisitor {
 
   visitStringNode(str: StringNode): string {
     return '"' + str.atom + '"';
+  }
+
+  visitInputNode(input: InputNode): string {
+    this.hasInput = true;
+    return 's.next()';
+  }
+
+  visitIntConversionNode(intConversion: IntConversionNode): string {
+    return 'Integer.parseInt(' + this.visit(intConversion.arg) + ')';
+  }
+
+  visitPrintNode(print: PrintNode): string {
+    return 'System.out.println(' + this.visit(print.arg) + ');';
   }
 
   visitType(type: Type): string {

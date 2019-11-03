@@ -7,8 +7,8 @@ import {
   BinaryLogicalOperation, BooleanNode,
   ComparisonNode,
   ComparisonOperation, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode,
-  Node,
+  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode,
+  Node, PrintNode,
   RootNode, StringNode, Type,
   UnaryLogicalNode,
   UnaryLogicalOperation, WhileLoopNode
@@ -60,6 +60,10 @@ export abstract class AstVisitor<T> {
   abstract visitElseStatementNode(elseStatement: ElseStatementNode): T;
   abstract visitWhileLoopNode(whileLoop: WhileLoopNode): T;
   abstract visitForLoopNode(forLoopNode: ForLoopNode): T;
+
+  abstract visitPrintNode(print: PrintNode): T;
+  abstract visitInputNode(input: InputNode): T;
+  abstract visitIntConversionNode(intConversion: IntConversionNode): T;
 
   abstract visitArithmeticOperation(operation: ArithmeticOperation): T;
   abstract visitUnaryLogicalOperation(operation: UnaryLogicalOperation): T;

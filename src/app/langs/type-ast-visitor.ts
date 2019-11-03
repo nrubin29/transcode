@@ -14,8 +14,8 @@ import {
   ElseStatementNode,
   ForLoopNode,
   FunctionCallNode,
-  IfStatementNode,
-  PrimitiveType,
+  IfStatementNode, InputNode, IntConversionNode,
+  PrimitiveType, PrintNode,
   RootNode,
   StringNode,
   Type,
@@ -185,5 +185,16 @@ export class TypeAstVisitor extends AstVisitor<void> {
 
   visitStringNode(str: StringNode): void {
     str.type = {type: PrimitiveType.STRING, isArray: false};
+  }
+
+  visitInputNode(input: InputNode): void {
+    input.type = {type: PrimitiveType.STRING, isArray: false};
+  }
+
+  visitPrintNode(print: PrintNode): void {
+  }
+
+  visitIntConversionNode(intConversion: IntConversionNode): void {
+    intConversion.type = {type: PrimitiveType.INTEGER, isArray: false};
   }
 }

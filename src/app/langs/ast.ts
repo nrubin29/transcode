@@ -110,13 +110,18 @@ export class ForLoopNode extends Node {
   constructor(public controlVariable: AtomNode, public start: ExpressionNode, public stop: ExpressionNode, public step: ExpressionNode, public statements: Node[]) { super(); }
 }
 
-/*
-Add support for:
- print
- input
+export class PrintNode extends Node {
+  constructor(public arg?: ExpressionNode) { super(); }
+}
 
- arbitrary parentheses
- */
+export class InputNode extends ExpressionNode {
+  // TODO: Add prompt?
+  constructor() { super(); }
+}
+
+export class IntConversionNode extends ExpressionNode {
+  constructor(public arg: ExpressionNode) { super(); }
+}
 
 export class AtomNode extends ExpressionNode {
   constructor(public atom: string) { super(); }

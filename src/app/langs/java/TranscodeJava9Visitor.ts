@@ -2,10 +2,10 @@ import {Java9Visitor} from '../../../antlr/java/Java9Visitor';
 import {
   ArithmeticNode, AssignmentNode, AtomNode,
   BinaryLogicalOperation,
-  ComparisonNode, DeclarationNode,
+  ComparisonNode, DeclarationNode, DotAccessNode,
   ExpressionNode,
-  FunctionCallNode,
-  Node,
+  FunctionCallNode, InputNode, IntConversionNode,
+  Node, PrintNode,
   RootNode,
   UnaryLogicalOperation
 } from '../ast';
@@ -15,7 +15,7 @@ import {
   LocalVariableDeclarationContext,
   MethodInvocationContext,
   MultiplicativeExpressionContext,
-  RelationalExpressionContext, VariableDeclaratorContext
+  RelationalExpressionContext, TypeNameContext, VariableDeclaratorContext
 } from '../../../antlr/java/Java9Parser';
 import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree} from 'antlr4ts/tree';
@@ -26,22 +26,63 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
     return new RootNode(ctx.blockStatement().map(child => this.visit(child)));
   }
 
-  // visitExpressionStatement(ctx: ExpressionStatementContext) {
-  //   return new RootNode([this.visit(ctx.children[0])]);
-  // }
-
   visitMethodInvocation(ctx: MethodInvocationContext) {
-    const identifier = this.visitAtom(ctx.methodName());
-    const args = ctx.argumentList().children.map(child => this.visit(child));
+    let identifier;
+    let args;
+
+    if (ctx.typeName()) {
+      identifier = new DotAccessNode(this.visit(ctx.typeName()) as ExpressionNode, this.visit(ctx.identifier()) as AtomNode);
+    }
+
+    else {
+      identifier = this.visitAtom(ctx.methodName());
+    }
+
+    if (ctx.argumentList()) {
+      args = ctx.argumentList().children.map(child => this.visit(child));
+    }
+
+    else {
+      args = [];
+    }
+
+    if (identifier instanceof DotAccessNode &&
+      identifier.left instanceof DotAccessNode &&
+      identifier.left.left instanceof AtomNode &&
+      identifier.left.left.atom === 'System' &&
+      identifier.left.right instanceof AtomNode &&
+      identifier.left.right.atom === 'out' &&
+      identifier.right instanceof AtomNode &&
+      identifier.right.atom === 'println') {
+      return new PrintNode(args.length > 0 ? args[0] as ExpressionNode : undefined);
+    }
+
+    else if (identifier instanceof DotAccessNode &&
+      identifier.left instanceof AtomNode &&
+      identifier.left.atom === 's' &&
+      identifier.right instanceof AtomNode &&
+      identifier.right.atom === 'next') {
+      return new InputNode();
+    }
+
+    else if (identifier instanceof DotAccessNode &&
+      identifier.left instanceof AtomNode &&
+      identifier.left.atom === 'Integer' &&
+      identifier.right instanceof AtomNode &&
+      identifier.right.atom === 'parseInt') {
+      return new IntConversionNode(args[0] as ExpressionNode);
+    }
+
     return new FunctionCallNode(identifier, args as ExpressionNode[]);
   }
 
-  // visitLocalVariableDeclaration(ctx: LocalVariableDeclarationContext) {
-  //   // TODO: Handle modifiers.
-  //   const type = this.visit(ctx.unannType());
-  //   const [name, value] = this.visitVariableDeclarator(ctx.variableDeclaratorList()[0]);
-  //   return new AssignmentNode(name as AtomNode, value as ExpressionNode);
-  // }
+  visitTypeName(ctx: TypeNameContext) {
+    if (ctx.childCount === 3) {
+      const left = this.visit(ctx.packageOrTypeName());
+      const right = this.visit(ctx.identifier());
+      return new DotAccessNode(left as ExpressionNode, right as AtomNode);
+    }
+  }
 
   visitLocalVariableDeclaration(ctx: LocalVariableDeclarationContext) {
     // TODO: Handle types.
