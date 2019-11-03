@@ -64,6 +64,46 @@ export class FunctionCallNode extends ExpressionNode {
   constructor(public func: AtomNode, public args: ExpressionNode[]) { super(); }
 }
 
+export class DotAccessNode extends ExpressionNode {
+  constructor(public left: AtomNode, public right: ExpressionNode) { super(); }
+}
+
+export class ArrayAccessNode extends ExpressionNode {
+  constructor(public array: ExpressionNode, public index: ExpressionNode) { super(); }
+}
+
+export class IfStatementNode extends Node {
+  constructor(public condition: ExpressionNode, public statements: Node[]) { super(); }
+}
+
+export class ElseIfStatementNode extends Node {
+  constructor(public condition: ExpressionNode, public statements: Node[]) { super(); }
+}
+
+export class ElseStatementNode extends Node {
+  constructor(public statements: Node[]) { super(); }
+}
+
+export class WhileLoopNode extends Node {
+  constructor(public condition: ExpressionNode, public statements: Node[]) { super(); }
+}
+
+export class ForLoopNode extends Node {
+  constructor(public controlVariable: AtomNode, public start: ExpressionNode, public stop: ExpressionNode, public step: ExpressionNode, public statements: Node[]) { super(); }
+}
+
+// export class EnhancedForLoopNode extends Node {
+//   constructor(public controlVariable: AtomNode, public iterable: ExpressionNode, public statements: Node[]) { super(); }
+// }
+
+/*
+Add support for:
+ print
+ input
+
+ arbitrary parentheses
+ */
+
 export class AtomNode extends ExpressionNode {
   constructor(public atom: string) { super(); }
 }

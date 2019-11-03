@@ -1,17 +1,17 @@
 import {
   ArithmeticNode,
-  ArithmeticOperation,
+  ArithmeticOperation, ArrayAccessNode,
   AssignmentNode,
   AtomNode,
   BinaryLogicalNode,
   BinaryLogicalOperation,
   ComparisonNode,
-  ComparisonOperation,
-  FunctionCallNode,
+  ComparisonOperation, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
+  FunctionCallNode, IfStatementNode,
   Node,
   RootNode,
   UnaryLogicalNode,
-  UnaryLogicalOperation
+  UnaryLogicalOperation, WhileLoopNode
 } from './ast';
 
 /**
@@ -53,6 +53,13 @@ export abstract class AstVisitor {
   abstract visitBinaryLogicalNode(logic: BinaryLogicalNode): string;
   abstract visitComparisonNode(comparison: ComparisonNode): string;
   abstract visitFunctionCallNode(functionCall: FunctionCallNode): string;
+  abstract visitDotAccessNode(dotAccess: DotAccessNode): string;
+  abstract visitArrayAccessNode(arrayAccess: ArrayAccessNode): string;
+  abstract visitIfStatementNode(ifStatement: IfStatementNode): string;
+  abstract visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string;
+  abstract visitElseStatementNode(elseStatement: ElseStatementNode): string;
+  abstract visitWhileLoopNode(whileLoop: WhileLoopNode): string;
+  abstract visitForLoopNode(forLoopNode: ForLoopNode): string;
 
   visitArithmeticOperation(operation: ArithmeticOperation): string {
     switch (operation) {
