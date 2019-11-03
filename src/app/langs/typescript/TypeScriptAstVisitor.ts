@@ -13,7 +13,7 @@ import {
   ForLoopNode,
   FunctionCallNode,
   IfStatementNode, InputNode, IntConversionNode,
-  PrimitiveType, PrintNode,
+  PrimitiveType, PrintNode, StatementNode,
   StringNode,
   Type,
   UnaryLogicalNode,
@@ -25,6 +25,10 @@ import {log} from 'util';
 export class TypeScriptAstVisitor extends StringAstVisitor {
   variablesSeen = new Set<string>();
 
+  visitStatementNode(statement: StatementNode): string {
+    return this.visit(statement.node) + ';';
+  }
+
   visitArrayAccessNode(arrayAccess: ArrayAccessNode): string {
     return this.visit(arrayAccess.array) + '[' + this.visit(arrayAccess.index) + ']';
   }
@@ -33,31 +37,24 @@ export class TypeScriptAstVisitor extends StringAstVisitor {
     return this.visit(dotAccess.left) + '.' + this.visit(dotAccess.right);
   }
 
-  visitForLoopNode(forLoopNode: ForLoopNode): string {
-    const i = this.visit(forLoopNode.controlVariable)
-    return 'for (let ' + i + ' = ' + this.visit(forLoopNode.start) + '; ' +
-      i + ' < ' + this.visit(forLoopNode.stop) + '; ' +
-      this.visit(forLoopNode.step) === '1' ? (i + '++') : (i + ' += ' + this.visit(forLoopNode.step) ) + ' ) {\n' +
-      forLoopNode.statements.map(stat => '\t' + this.visit(stat)).join('\n') +
-      '\n}';
-  }
-
   visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n} ' + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n') + (ifStatement.els ? this.visit(ifStatement.els) : '');
+    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => this.visit(statement)) + '\n' + this.indentation(ifStatement.depth) + '}' + (ifStatement.elseIfs.length > 0 ? '\n\n' : '') + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n\n') + (ifStatement.els ? '\n\n' + this.visit(ifStatement.els) : '');
   }
 
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
-    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' + elseIfStatement.statements.map(statement => '  ' + this.visit(statement)).join('\n') + '\n} ';
+    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' + elseIfStatement.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(elseIfStatement.depth) + '}';
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
-    return 'else {\n' + elseStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n}';
+    return 'else {\n' + elseStatement.statements.map(statement => this.visit(statement)) + '\n' + this.indentation(elseStatement.depth) + '}';
+  }
+
+  visitForLoopNode(forLoopNode: ForLoopNode): string {
+    return 'for (' + this.visitType(forLoopNode.start.type) + ' ' + this.visit(forLoopNode.controlVariable) + ' = ' + this.visit(forLoopNode.start) + '; ' + this.visit(forLoopNode.controlVariable) + ' < ' + this.visit(forLoopNode.stop) + '; ' + this.visit(forLoopNode.controlVariable) + ' += ' + this.visit(forLoopNode.step) + ') {\n' + forLoopNode.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(forLoopNode.depth) + '}';
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
-    return 'while (' + this.visit(whileLoop.condition) + ' ) {\n' +
-      whileLoop.statements.map(stat => '\t' + this.visit(stat)).join('\n') +
-      '\n}';
+    return 'while (' + this.visit(whileLoop.condition) + ') {\n' + whileLoop.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(whileLoop.depth) + '}';
   }
 
   visitArithmeticNode(arithmetic: ArithmeticNode): string {
@@ -66,7 +63,7 @@ export class TypeScriptAstVisitor extends StringAstVisitor {
 
   visitAssignmentNode(assignment: AssignmentNode): string {
     if (this.variablesSeen.has(assignment.name.atom)) {
-      return this.visit(assignment.name) + ' = ' + this.visit(assignment.value) + ';';
+      return this.visit(assignment.name) + ' = ' + this.visit(assignment.value);
     } else {
       // This is a hack because Python can't differentiate between assignments and declarations.
       this.variablesSeen.add(assignment.name.atom);
@@ -75,7 +72,7 @@ export class TypeScriptAstVisitor extends StringAstVisitor {
   }
 
   visitDeclarationNode(declaration: DeclarationNode): string {
-    return 'let ' + this.visit(declaration.name) + ': ' + this.visitType(declaration.value.type) + ' = ' + this.visit(declaration.value) + ';';
+    return 'let ' + this.visit(declaration.name) + ': ' + this.visitType(declaration.value.type) + ' = ' + this.visit(declaration.value);
   }
 
   visitBinaryLogicalNode(logic: BinaryLogicalNode): string {

@@ -7,20 +7,20 @@ import {
   BinaryLogicalOperation, BooleanNode,
   ComparisonNode, DeclarationNode,
   DotAccessNode, ElseIfStatementNode, ElseStatementNode,
-  ExpressionNode,
+  ExpressionNode, ForLoopNode,
   FunctionCallNode, IfStatementNode, InputNode, IntConversionNode,
   Node, PrintNode,
-  RootNode, StringNode,
+  RootNode, StatementNode, StringNode,
   UnaryLogicalNode,
-  UnaryLogicalOperation
+  UnaryLogicalOperation, WhileLoopNode
 } from '../ast';
 import {
   AdditiveExpressionContext,
   ArgumentsExpressionContext, ArrayLiteralContext, BlockContext,
   EqualityExpressionContext,
-  ExpressionSequenceContext,
+  ExpressionSequenceContext, ForStatementContext,
   IdentifierExpressionContext,
-  IdentifierNameContext, IfStatementContext,
+  IdentifierNameContext, IfStatementContext, IterationStatementContext,
   LogicalAndExpressionContext, LogicalOrExpressionContext,
   MemberDotExpressionContext, MemberIndexExpressionContext,
   MultiplicativeExpressionContext,
@@ -28,7 +28,7 @@ import {
   ParenthesizedExpressionContext,
   ProgramContext,
   RelationalExpressionContext,
-  SingleExpressionContext, StatementListContext,
+  SingleExpressionContext, SourceElementContext, StatementContext, StatementListContext,
   VariableDeclarationContext, VariableStatementContext
 } from '../../../antlr/typescript/TypeScriptParser';
 import {TranscodeVisitor} from '../transcode-visitor';
@@ -41,6 +41,22 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
   // Program start
   visitProgram(ctx: ProgramContext) {
     return new RootNode(ctx.sourceElements().children.map(child => this.visit(child)));
+  }
+
+  visitStatement(ctx: StatementContext) {
+    const stat = this.visit(ctx.getChild(0));
+    if (stat instanceof IfStatementNode || stat instanceof ForLoopNode || stat instanceof WhileLoopNode || ElseIfStatementNode || ElseStatementNode) {
+      return stat;
+    } else {
+      return new StatementNode(stat);
+    }
+  }
+
+  visitBlock(ctx: BlockContext): any {
+    if (ctx.statementList()) {
+      const stateList = ctx.statementList();
+      return stateList.statement().map(state => this.visit(state));
+    }
   }
 
   visitAtom(ctx: ParseTree): AtomNode {
@@ -191,6 +207,20 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
     }
   }
 
+  // For loops
+
+  visitForStatement(ctx: ForStatementContext) {
+    const name = this.visit(ctx.getChild(2).getChild(0).getChild(1).getChild(0));
+    const start = this.visit(ctx.getChild(2).getChild(0).getChild(1).getChild(2));
+    const comp = this.visit(ctx.getChild(4)) as ComparisonNode;
+    const step = new AtomNode('1');
+    const statements = this.visit(ctx.getChild(8)) as unknown as StatementNode[];
+    const stop = comp.right;
+    return new ForLoopNode(name as AtomNode, start as ExpressionNode, stop, step, statements);
+  }
+
+
+
   // Dot Access
 
   visitMemberDotExpression(ctx: MemberDotExpressionContext) {
@@ -284,20 +314,23 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
         // Set it as current if
         currCTX = currCTX.statement()[1].getChild(0) as IfStatementContext;
         // Add it to the array
-        elseIfs.push(new ElseIfStatementNode(this.visit(currCTX.getChild(2)) as ExpressionNode, this.parseStatements(currCTX.getChild(4))));
+        elseIfs.push(new ElseIfStatementNode(
+          this.visit(currCTX.getChild(2)) as ExpressionNode,
+          this.visit(currCTX.getChild(4)) as StatementNode[]
+        ));
       } else {
         break;
       }
     }
 
     if (currCTX.Else()) {
-      const elseStatements = this.parseStatements(currCTX.statement()[1]);
+      const elseStatements = this.visit(currCTX.statement()[1].getChild(0)) as StatementNode[];
       elseE = new ElseStatementNode(elseStatements);
     }
 
     // Parse statement into things
-    const statement = ctx.getChild(4);
-    return new IfStatementNode(expr as ExpressionNode, this.parseStatements(statement), elseIfs, elseE);
+    const statement = this.visit(ctx.getChild(4)) as StatementNode[];
+    return new IfStatementNode(expr as ExpressionNode, statement, elseIfs, elseE);
   }
 
   parseStatements(statement: ParseTree): ExpressionNode[] {
