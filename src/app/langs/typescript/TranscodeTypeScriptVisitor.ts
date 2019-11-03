@@ -87,7 +87,7 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
           }
         }
         // Create and return function
-        return new FunctionCallNode(name, args);
+        return new FunctionCallNode(func as ExpressionNode, args);
       }
     } else if (ctx.childCount === 3) {
       // Traditional assignment aka a = b
@@ -230,17 +230,35 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
   // If statement
 
   visitIfStatement(ctx: IfStatementContext) {
-    const expr = this.visit(ctx.getChild(2));
 
-    // const elseIfs: ElseIfStatementNode[] = [];
-    // const else: ElseStatementNode;
-    // // Check for else-ifs and final else
-    //
-    // // If we have an else statement
-    // if (ctx.children)
+    const expr = this.visit(ctx.getChild(2));
+    const elseIfs: ElseIfStatementNode[] = [];
+    let elseE: ElseStatementNode = undefined;
+
+    let currCTX: IfStatementContext = ctx;
+    while (true) {
+      // If we have an else-if
+      if (currCTX.Else() && currCTX.statement()[1].getChild(0) instanceof IfStatementContext) {
+        // Set it as current if
+        currCTX = currCTX.statement()[1].getChild(0) as IfStatementContext;
+        // Add it to the array
+        elseIfs.push(new ElseIfStatementNode(this.visit(currCTX.getChild(2)) as ExpressionNode, this.parseStatements(currCTX.getChild(4))));
+      } else {
+        break;
+      }
+    }
+
+    if (currCTX.Else()) {
+      const elseStatements = this.parseStatements(currCTX.statement()[1]);
+      elseE = new ElseStatementNode(elseStatements);
+    }
 
     // Parse statement into things
     const statement = ctx.getChild(4);
+    return new IfStatementNode(expr as ExpressionNode, this.parseStatements(statement), elseIfs, elseE);
+  }
+
+  parseStatements(statement: ParseTree): ExpressionNode[] {
     let statements: ExpressionNode[] = [];
 
     if (statement.getChild(0) instanceof BlockContext) {
@@ -249,10 +267,10 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
         statements.push(this.visit(child) as ExpressionNode);
       }
 
-      return new IfStatementNode(expr as ExpressionNode, statements);
+      return statements;
     } else {
       statements = [this.visit(statement.getChild(0)) as ExpressionNode];
-      return new IfStatementNode(expr as ExpressionNode, statements);
+      return statements;
     }
   }
 }
