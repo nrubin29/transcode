@@ -332,20 +332,4 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
     const statement = this.visit(ctx.getChild(4)) as unknown as StatementNode[];
     return new IfStatementNode(expr as ExpressionNode, statement, elseIfs, elseE);
   }
-
-  parseStatements(statement: ParseTree): ExpressionNode[] {
-    let statements: ExpressionNode[] = [];
-
-    if (statement.getChild(0) instanceof BlockContext) {
-      const stateList = statement.getChild(0).getChild(1) as StatementListContext;
-      for (const child of stateList.children) {
-        statements.push(this.visit(child) as ExpressionNode);
-      }
-
-      return statements;
-    } else {
-      statements = [this.visit(statement.getChild(0)) as ExpressionNode];
-      return statements;
-    }
-  }
 }
