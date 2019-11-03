@@ -70,7 +70,9 @@ export class Python3AstVisitor extends StringAstVisitor {
   }
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
-    return '';
+    return 'for ' + forLoopNode.controlVariable.atom + ' in range(' + (this.visit(forLoopNode.start) ? this.visit(forLoopNode.start) + ', ' : '')
+      + this.visit(forLoopNode.stop) + (this.visit(forLoopNode.step) === '1' ? '' : ', ' + this.visit(forLoopNode.step)) + '):'
+      + '\n' + forLoopNode.statements.map(child => '  ' + this.visit(child)).join('\n');
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
