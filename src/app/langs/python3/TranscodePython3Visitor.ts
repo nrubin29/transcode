@@ -8,7 +8,16 @@ import {
   RootNode,
   UnaryLogicalOperation,
   ExpressionNode,
-  AssignmentNode, AtomNode, BinaryLogicalNode, UnaryLogicalNode, ComparisonNode, IfStatementNode, ElseStatementNode, BooleanNode, StringNode
+  AssignmentNode,
+  AtomNode,
+  BinaryLogicalNode,
+  UnaryLogicalNode,
+  ComparisonNode,
+  IfStatementNode,
+  ElseStatementNode,
+  BooleanNode,
+  StringNode,
+  PrintNode, InputNode, IntConversionNode
 } from '../ast';
 import {
   ArglistContext,
@@ -38,8 +47,18 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
     if (ctx.childCount === 2 && ctx.trailer().length > 0) {
       const name = this.visitAtom(ctx.atom());
       const args = this.visitTrailer(ctx.trailer()[0]);
+      if (name.atom === 'print') {
+        return new PrintNode(args as ExpressionNode[]);
+      }
+      else if (name.atom === 'input') {
+        return new InputNode();
+      }
+      else if (name.atom === 'int') {
+        return new IntConversionNode(args[0] as ExpressionNode);
+      }
       return new FunctionCallNode(name, args as ExpressionNode[]);
     }
+
   }
 
   visitTrailer(ctx: TrailerContext) {
@@ -146,5 +165,4 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       return new IfStatementNode(condition, statements, [],  new ElseStatementNode(elseStatements));
     }
   }
-
 }
