@@ -316,7 +316,7 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
         // Add it to the array
         elseIfs.push(new ElseIfStatementNode(
           this.visit(currCTX.getChild(2)) as ExpressionNode,
-          this.visit(currCTX.getChild(4)) as StatementNode[]
+          this.visit(currCTX.getChild(4)) as unknown as StatementNode[]
         ));
       } else {
         break;
@@ -324,12 +324,12 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
     }
 
     if (currCTX.Else()) {
-      const elseStatements = this.visit(currCTX.statement()[1].getChild(0)) as StatementNode[];
+      const elseStatements = this.visit(currCTX.statement()[1].getChild(0)) as unknown as StatementNode[];
       elseE = new ElseStatementNode(elseStatements);
     }
 
     // Parse statement into things
-    const statement = this.visit(ctx.getChild(4)) as StatementNode[];
+    const statement = this.visit(ctx.getChild(4)) as unknown as StatementNode[];
     return new IfStatementNode(expr as ExpressionNode, statement, elseIfs, elseE);
   }
 
