@@ -40,6 +40,7 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+/parse_tree_pics
 
 # System Files
 .DS_Store
