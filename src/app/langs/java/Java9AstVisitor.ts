@@ -42,6 +42,7 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitDeclarationNode(declaration: DeclarationNode): string {
+    this.variablesSeen.add(declaration.name.atom);
     return this.visitType(declaration.value.type) + ' ' + this.visit(declaration.name) + ' = ' + this.visit(declaration.value) + ';';
   }
 
@@ -71,11 +72,11 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
-    return 'else if (' + this.visit(elseIfStatement.condition) + ') {' + elseIfStatement.statements.map(statement => '\t' + this.visit(statement)).join('\n') + '}';
+    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' + elseIfStatement.statements.map(statement => '  ' + this.visit(statement)).join('\n') + '\n}';
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
-    return 'else {' + elseStatement.statements.map(statement => '\t' + this.visit(statement)) + '}';
+    return 'else {\n' + elseStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n}';
   }
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
@@ -83,11 +84,11 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return 'if (' + this.visit(ifStatement.condition) + ') {' + ifStatement.statements.map(statement => '\t' + this.visit(statement)) + '}' + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n') + (ifStatement.els ? this.visit(ifStatement.els) : '');
+    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n}' + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n') + (ifStatement.els ? this.visit(ifStatement.els) : '');
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
-    return 'while (' + this.visit(whileLoop.condition) + ') {' + whileLoop.statements.map(statement => '\t' + this.visit(statement)).join('\n') + '}';
+    return 'while (' + this.visit(whileLoop.condition) + ') {\n' + whileLoop.statements.map(statement => '  ' + this.visit(statement)).join('\n') + '\n}';
   }
 
   visitBooleanNode(bool: BooleanNode): string {
