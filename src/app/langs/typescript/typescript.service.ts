@@ -17,7 +17,10 @@ export class TypescriptService extends LanguageService<ProgramContext> {
     const lexer = new TypeScriptLexer(inputStream);
     const tokenStream = new CommonTokenStream(lexer);
     const parser = new TypeScriptParser(tokenStream);
-    return parser.program();
+    console.log('Antlr:');
+    const prog = parser.program();
+    console.log(prog);
+    return prog;
   }
 
   convertAntlrToAst(antlrRoot: ProgramContext): Ast {
