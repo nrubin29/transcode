@@ -34,6 +34,7 @@ import {
 import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree, TerminalNode} from 'antlr4ts/tree';
 import {ArgumentContext} from '../../../antlr/python3/Python3Parser';
+import {ParserRuleContext} from 'antlr4ts';
 
 export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements TypeScriptParserVisitor<Node> {
 
@@ -76,8 +77,7 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
     }
   }
 
-  // Variable assignments and Function Calls
-  visitVariableDeclaration(ctx: VariableDeclarationContext) {
+  detectFunction(ctx: ParserRuleContext): Node | undefined {
     if (ctx.childCount === 2) {
       if (ctx.getChild(1) instanceof ParenthesizedExpressionContext) {
         // Function Call
@@ -111,6 +111,13 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
         // Create and return function
         return new FunctionCallNode(func as ExpressionNode, args);
       }
+    }
+  }
+
+  // Variable assignments and Function Calls
+  visitVariableDeclaration(ctx: VariableDeclarationContext) {
+    if (this.detectFunction(ctx)) {
+      return this.detectFunction(ctx);
     } else if (ctx.childCount === 3) {
       // Traditional assignment aka a = b
       const ident = this.visit(ctx.Identifier());
@@ -150,6 +157,10 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
   }
 
   visitIdentifierExpression(ctx: IdentifierExpressionContext) {
+    if (this.detectFunction(ctx)) {
+      return this.detectFunction(ctx);
+    }
+
     if (ctx.childCount === 2) {
       if (ctx.getChild(0) instanceof IdentifierNameContext) {
         const lhs = this.visit(ctx.getChild(0));
