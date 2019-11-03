@@ -3,26 +3,26 @@ import {LanguageService} from '../language-service';
 import {Ast} from '../ast';
 import {CharStreams, CommonTokenStream} from 'antlr4ts';
 import {Java9Lexer} from '../../../antlr/java/Java9Lexer';
-import {BlockStatementsContext, Java9Parser} from '../../../antlr/java/Java9Parser';
+import {BlockContext, Java9Parser} from '../../../antlr/java/Java9Parser';
 import {TranscodeJava9Visitor} from './TranscodeJava9Visitor';
 import {Java9AstVisitor} from './Java9AstVisitor';
 
 @Injectable({
   providedIn: 'root'
 })
-export class JavaService extends LanguageService<BlockStatementsContext> {
+export class JavaService extends LanguageService<BlockContext> {
 
-  convertCodeToAntlr(code: string): BlockStatementsContext {
-    const inputStream = CharStreams.fromString(code);
+  convertCodeToAntlr(code: string): BlockContext {
+    const inputStream = CharStreams.fromString('{' + code + '}');
     const lexer = new Java9Lexer(inputStream);
     const tokenStream = new CommonTokenStream(lexer);
     const parser = new Java9Parser(tokenStream);
-    return parser.blockStatements();
+    return parser.block();
   }
 
-  convertAntlrToAst(antlrRoot: BlockStatementsContext): Ast {
+  convertAntlrToAst(antlrRoot: BlockContext): Ast {
     const visitor = new TranscodeJava9Visitor();
-    const root = visitor.visitBlockStatements(antlrRoot);
+    const root = visitor.visitBlock(antlrRoot);
     return {root};
   }
 

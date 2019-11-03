@@ -10,9 +10,8 @@ import {
   UnaryLogicalOperation
 } from '../ast';
 import {
-  AdditiveExpressionContext, AssignmentContext, BlockStatementsContext,
-  EqualityExpressionContext,
-  LocalVariableDeclarationContext,
+  AdditiveExpressionContext, AssignmentContext, BlockContext, EqualityExpressionContext,
+  LocalVariableDeclarationContext, MethodInvocation_lfno_primaryContext,
   MethodInvocationContext,
   MultiplicativeExpressionContext,
   RelationalExpressionContext, TypeNameContext, VariableDeclaratorContext
@@ -21,59 +20,75 @@ import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree} from 'antlr4ts/tree';
 
 export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visitor<Node> {
+  seenRoot = false;
 
-  visitBlockStatements(ctx: BlockStatementsContext) {
-    return new RootNode(ctx.blockStatement().map(child => this.visit(child)));
+  visitBlock(ctx: BlockContext) {
+    if (!this.seenRoot) {
+      this.seenRoot = true;
+      return new RootNode(ctx.blockStatements().blockStatement().map(child => this.visit(child)));
+    }
   }
 
+  // visitBlockStatements(ctx: BlockStatementsContext) {
+  //
+  // }*/
+
   visitMethodInvocation(ctx: MethodInvocationContext) {
-    let identifier: Node;
-    let args: Node[];
+    console.log(ctx);
 
-    if (ctx.typeName()) {
-      identifier = new DotAccessNode(this.visit(ctx.typeName()) as ExpressionNode, this.visit(ctx.identifier()) as AtomNode);
+    if (ctx.childCount >= 5) {
+      let identifier: Node;
+      let args: Node[];
+
+      if (ctx.typeName()) {
+        identifier = new DotAccessNode(this.visit(ctx.typeName()) as ExpressionNode, this.visit(ctx.identifier()) as AtomNode);
+      }
+
+      else {
+        identifier = this.visitAtom(ctx.methodName());
+      }
+
+      if (ctx.argumentList()) {
+        args = ctx.argumentList().children.map(child => this.visit(child));
+      }
+
+      else {
+        args = [];
+      }
+
+      if (identifier instanceof DotAccessNode &&
+        identifier.left instanceof DotAccessNode &&
+        identifier.left.left instanceof AtomNode &&
+        identifier.left.left.atom === 'System' &&
+        identifier.left.right instanceof AtomNode &&
+        identifier.left.right.atom === 'out' &&
+        identifier.right instanceof AtomNode &&
+        identifier.right.atom === 'println') {
+        return new PrintNode(args as ExpressionNode[]);
+      }
+
+      else if (identifier instanceof DotAccessNode &&
+        identifier.left instanceof AtomNode &&
+        identifier.left.atom === 's' &&
+        identifier.right instanceof AtomNode &&
+        identifier.right.atom === 'next') {
+        return new InputNode();
+      }
+
+      else if (identifier instanceof DotAccessNode &&
+        identifier.left instanceof AtomNode &&
+        identifier.left.atom === 'Integer' &&
+        identifier.right instanceof AtomNode &&
+        identifier.right.atom === 'parseInt') {
+        return new IntConversionNode(args[0] as ExpressionNode);
+      }
+
+      return new FunctionCallNode(identifier as ExpressionNode, args as ExpressionNode[]);
     }
+  }
 
-    else {
-      identifier = this.visitAtom(ctx.methodName());
-    }
-
-    if (ctx.argumentList()) {
-      args = ctx.argumentList().children.map(child => this.visit(child));
-    }
-
-    else {
-      args = [];
-    }
-
-    if (identifier instanceof DotAccessNode &&
-      identifier.left instanceof DotAccessNode &&
-      identifier.left.left instanceof AtomNode &&
-      identifier.left.left.atom === 'System' &&
-      identifier.left.right instanceof AtomNode &&
-      identifier.left.right.atom === 'out' &&
-      identifier.right instanceof AtomNode &&
-      identifier.right.atom === 'println') {
-      return new PrintNode(args as ExpressionNode[]);
-    }
-
-    else if (identifier instanceof DotAccessNode &&
-      identifier.left instanceof AtomNode &&
-      identifier.left.atom === 's' &&
-      identifier.right instanceof AtomNode &&
-      identifier.right.atom === 'next') {
-      return new InputNode();
-    }
-
-    else if (identifier instanceof DotAccessNode &&
-      identifier.left instanceof AtomNode &&
-      identifier.left.atom === 'Integer' &&
-      identifier.right instanceof AtomNode &&
-      identifier.right.atom === 'parseInt') {
-      return new IntConversionNode(args[0] as ExpressionNode);
-    }
-
-    return new FunctionCallNode(identifier as ExpressionNode, args as ExpressionNode[]);
+  visitMethodInvocation_lfno_primary(ctx: MethodInvocation_lfno_primaryContext) {
+    return this.visitMethodInvocation(ctx as MethodInvocationContext);
   }
 
   visitTypeName(ctx: TypeNameContext) {
@@ -90,7 +105,6 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
   }
 
   visitVariableDeclarator(ctx: VariableDeclaratorContext) {
-    console.log('variable');
     const name = this.visit(ctx.variableDeclaratorId());
     const value = this.visit(ctx.variableInitializer());
     return new DeclarationNode(name as AtomNode, value as ExpressionNode);
