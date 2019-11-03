@@ -4,13 +4,13 @@ import {
   AssignmentNode,
   AtomNode,
   BinaryLogicalNode,
-  BinaryLogicalOperation,
+  BinaryLogicalOperation, BooleanNode,
   ComparisonNode, DeclarationNode,
   DotAccessNode, ElseIfStatementNode, ElseStatementNode,
   ExpressionNode,
-  FunctionCallNode, IfStatementNode,
-  Node,
-  RootNode,
+  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode,
+  Node, PrintNode,
+  RootNode, StringNode,
   UnaryLogicalNode,
   UnaryLogicalOperation
 } from '../ast';
@@ -40,6 +40,16 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
   // Program start
   visitProgram(ctx: ProgramContext) {
     return new RootNode(ctx.sourceElements().children.map(child => this.visit(child)));
+  }
+
+  visitAtom(ctx: ParseTree): AtomNode {
+    if (ctx.text === 'true' || ctx.text === 'false') {
+      return new BooleanNode(ctx.text === 'true');
+    } else if (ctx.text.startsWith('\'') || ctx.text.startsWith('\"')) {
+      return new StringNode(ctx.text.substring(1, ctx.text.length - 1));
+    }
+
+    return super.visitAtom(ctx);
   }
 
   visitBinaryLogicalOperation(operation: ParseTree): BinaryLogicalOperation {
@@ -86,6 +96,18 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
             args.push(this.visit(child) as ExpressionNode);
           }
         }
+
+        if (ctx.getChild(0).text === 'parseInt') {
+          const x = args[0];
+          return new IntConversionNode(x);
+        } else if (ctx.getChild(0).text === 'prompt') {
+          return new InputNode();
+        } else if (ctx.getChild(0).text === 'console.log') {
+          return new PrintNode(args);
+        }
+
+        // console.log won't appear here see ArgumentsExpression
+
         // Create and return function
         return new FunctionCallNode(func as ExpressionNode, args);
       }
@@ -113,6 +135,15 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
       } else {
         args.push(this.visit(child) as ExpressionNode);
       }
+    }
+
+    if (ctx.getChild(0).text === 'parseInt') {
+      const x = args[0];
+      return new IntConversionNode(x);
+    } else if (ctx.getChild(0).text === 'prompt') {
+      return new InputNode();
+    } else if (ctx.getChild(0).text === 'console.log') {
+      return new PrintNode(args);
     }
 
     return new FunctionCallNode(lhs as ExpressionNode, args);
