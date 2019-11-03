@@ -1,1 +1,2 @@
-<img src="assets/gifs/{{from}}to{{to}}.gif" />
+<img *ngIf="from !== to" src="assets/gifs/{{from}}to{{to}}.gif" />
+<p *ngIf="from === to">Converting code...</p>

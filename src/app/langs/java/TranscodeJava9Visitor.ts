@@ -1,12 +1,12 @@
 import {Java9Visitor} from '../../../antlr/java/Java9Visitor';
 import {
   ArithmeticNode, AssignmentNode, AtomNode,
-  BinaryLogicalOperation,
+  BinaryLogicalOperation, BooleanNode,
   ComparisonNode, DeclarationNode, DotAccessNode,
   ExpressionNode,
   FunctionCallNode, InputNode, IntConversionNode,
   Node, PrintNode,
-  RootNode,
+  RootNode, StringNode,
   UnaryLogicalOperation
 } from '../ast';
 import {
@@ -140,6 +140,18 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
       const operator = this.visitComparisonOperation(ctx.getChild(1));
       return new ComparisonNode(lhs as ExpressionNode, rhs as ExpressionNode, operator);
     }
+  }
+
+  visitAtom(ctx: ParseTree): AtomNode {
+    if (ctx.text === 'true' || ctx.text === 'false') {
+      return new BooleanNode(ctx.text === 'true');
+    }
+
+    else if (ctx.text.startsWith('"')) {
+      return new StringNode(ctx.text.substring(1, ctx.text.length - 1));
+    }
+
+    return super.visitAtom(ctx);
   }
 
   visitUnaryLogicalOperation(operation: ParseTree): UnaryLogicalOperation {
