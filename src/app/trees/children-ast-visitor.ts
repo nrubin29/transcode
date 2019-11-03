@@ -115,6 +115,6 @@ export class ChildrenAstVisitor extends AstVisitor<Node[]> {
   }
 
   visitPrintNode(print: PrintNode): Node[] {
-    return this.visit(print.arg);
+    return [].concat(...print.args.map(arg => this.visit(arg)));
   }
 }
