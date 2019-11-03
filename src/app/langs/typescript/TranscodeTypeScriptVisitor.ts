@@ -82,13 +82,13 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
       // Traditional assignment aka a = b
       const ident = this.visit(ctx.Identifier());
       const expression = this.visit(ctx.getChild(2));
-      return new AssignmentNode(ident as AtomNode, expression);
+      return new AssignmentNode(ident as AtomNode, expression as ExpressionNode);
     }
   }
 
   // Different type of function call
   visitArgumentsExpression(ctx: ArgumentsExpressionContext) {
-    const lhs = ctx.getChild(0);
+    const lhs = this.visit(ctx.getChild(0));
 
     const argContext = ctx.getChild(1) as ArgumentContext;
 
@@ -104,7 +104,7 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
       }
     }
 
-    return new FunctionCallNode(lhs, args);
+    return new FunctionCallNode(lhs as ExpressionNode, args);
   }
 
   visitIdentifierExpression(ctx: IdentifierExpressionContext) {
@@ -121,7 +121,7 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
                 // Non-Arithmetic addition aka a + b but not 4 + 5
                 const rhs = this.visit(rhsExpr.getChild(0));
 
-                return new ArithmeticNode(lhs, rhs, oper);
+                return new ArithmeticNode(lhs as ExpressionNode, rhs as ExpressionNode, oper);
               }
             }
           } else if (opExpr.childCount === 1 && opExpr.getChild(0) instanceof ArrayLiteralContext) {
@@ -131,7 +131,7 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
             // This will only get the first element in the list,
             // intentional because index access should only have 1 element.
             const indexExp = this.visit(elements);
-            return new ArrayAccessNode(lhs, indexExp);
+            return new ArrayAccessNode(lhs as ExpressionNode, indexExp as ExpressionNode);
           }
         }
       }
@@ -141,10 +141,10 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
   // Dot Access
 
   visitMemberDotExpression(ctx: MemberDotExpressionContext) {
-    const lhs = this.visit(ctx.getChild(0))
+    const lhs = this.visit(ctx.getChild(0));
     const right = this.visit(ctx.getChild(2));
 
-    return new DotAccessNode(lhs, right as AtomNode);
+    return new DotAccessNode(lhs as ExpressionNode, right as AtomNode);
   }
 
   // Array index access
@@ -153,7 +153,7 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
     const arrExpr = this.visit(ctx.getChild(0));
     const indexExpr = this.visit(ctx.getChild(2));
 
-    return new ArrayAccessNode(arrExpr, indexExpr);
+    return new ArrayAccessNode(arrExpr as ExpressionNode, indexExpr as ExpressionNode);
   }
 
   // Arithmetic Stuff
@@ -162,14 +162,14 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
     const lhs = this.visit(ctx.getChild(0));
     const oper = this.visitArithmeticOperation(ctx.getChild(1));
     const rhs = this.visit(ctx.getChild(2));
-    return new ArithmeticNode(lhs, rhs, oper);
+    return new ArithmeticNode(lhs as ExpressionNode, rhs as ExpressionNode, oper);
   }
 
   visitAdditiveExpression(ctx: AdditiveExpressionContext) {
     const lhs = this.visit(ctx.getChild(0));
     const oper = this.visitArithmeticOperation(ctx.getChild(1));
     const rhs = this.visit(ctx.getChild(2));
-    return new ArithmeticNode(lhs, rhs, oper);
+    return new ArithmeticNode(lhs as ExpressionNode, rhs as ExpressionNode, oper);
   }
 
   // Comparison Stuff
@@ -179,7 +179,7 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
     const oper = this.visitComparisonOperation(ctx.getChild(1));
     const rhs = this.visit(ctx.getChild(2));
 
-    return new ComparisonNode(lhs, rhs, oper);
+    return new ComparisonNode(lhs as ExpressionNode, rhs as ExpressionNode, oper);
   }
 
   visitEqualityExpression(ctx: EqualityExpressionContext) {
@@ -187,7 +187,7 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
     const oper = this.visitComparisonOperation(ctx.getChild(1));
     const rhs = this.visit(ctx.getChild(2));
 
-    return new ComparisonNode(lhs, rhs, oper);
+    return new ComparisonNode(lhs as ExpressionNode, rhs as ExpressionNode, oper);
   }
 
 
@@ -201,19 +201,19 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
 
   visitNotExpression(ctx: NotExpressionContext) {
     const expr = this.visit(ctx.getChild(1));
-    return new UnaryLogicalNode(expr, UnaryLogicalOperation.NOT);
+    return new UnaryLogicalNode(expr as ExpressionNode, UnaryLogicalOperation.NOT);
   }
 
   visitLogicalAndExpression(ctx: LogicalAndExpressionContext) {
     const lhs = this.visit(ctx.getChild(0));
     const rhs = this.visit(ctx.getChild(2));
-    return new BinaryLogicalNode(lhs, rhs, BinaryLogicalOperation.AND);
+    return new BinaryLogicalNode(lhs as ExpressionNode, rhs as ExpressionNode, BinaryLogicalOperation.AND);
   }
 
   visitLogicalOrExpression(ctx: LogicalOrExpressionContext) {
     const lhs = this.visit(ctx.getChild(0));
     const rhs = this.visit(ctx.getChild(2));
-    return new BinaryLogicalNode(lhs, rhs, BinaryLogicalOperation.OR);
+    return new BinaryLogicalNode(lhs as ExpressionNode, rhs as ExpressionNode, BinaryLogicalOperation.OR);
   }
 
   // If statement
@@ -221,16 +221,12 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
   visitIfStatement(ctx: IfStatementContext) {
     const expr = this.visit(ctx.getChild(2));
 
-    const elseIfs: ElseIfStatementNode[] = [];
-    const else: ElseStatementNode;
-    // Check for else-ifs and final else
-
-    // If we have an else statement
-    if (ctx.children)
-
-
-
-
+    // const elseIfs: ElseIfStatementNode[] = [];
+    // const else: ElseStatementNode;
+    // // Check for else-ifs and final else
+    //
+    // // If we have an else statement
+    // if (ctx.children)
 
     // Parse statement into things
     const statement = ctx.getChild(4);
@@ -239,13 +235,13 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
     if (statement.getChild(0) instanceof BlockContext) {
       const stateList = statement.getChild(0).getChild(1) as StatementListContext;
       for (const child of stateList.children) {
-        statements.push(this.visit(child));
+        statements.push(this.visit(child) as ExpressionNode);
       }
 
-      return new IfStatementNode(expr, statements);
+      return new IfStatementNode(expr as ExpressionNode, statements);
     } else {
-      statements = [this.visit(statement.getChild(0))];
-      return new IfStatementNode(expr, statements);
+      statements = [this.visit(statement.getChild(0)) as ExpressionNode];
+      return new IfStatementNode(expr as ExpressionNode, statements);
     }
   }
 }
