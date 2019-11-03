@@ -12,8 +12,8 @@ import {
   ElseStatementNode,
   ForLoopNode,
   FunctionCallNode,
-  IfStatementNode,
-  PrimitiveType,
+  IfStatementNode, InputNode, IntConversionNode,
+  PrimitiveType, PrintNode,
   StringNode,
   Type,
   UnaryLogicalNode,
@@ -138,5 +138,17 @@ export class TypeScriptAstVisitor extends StringAstVisitor {
 
   visitStringNode(str: StringNode): string {
     return '\'' + str.atom + '\'';
+  }
+
+  visitInputNode(input: InputNode): string {
+    return 'prompt()';
+  }
+
+  visitIntConversionNode(intConversion: IntConversionNode): string {
+    return 'parseInt(' + this.visit(intConversion.arg) + ', 10)';
+  }
+
+  visitPrintNode(print: PrintNode): string {
+    return 'console.log(' + print.args.map(arg => this.visit(arg)).join(', ') + ')';
   }
 }
