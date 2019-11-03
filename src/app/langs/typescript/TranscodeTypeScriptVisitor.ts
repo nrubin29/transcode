@@ -29,7 +29,7 @@ import {
   ProgramContext,
   RelationalExpressionContext,
   SingleExpressionContext, StatementListContext,
-  VariableDeclarationContext
+  VariableDeclarationContext, VariableStatementContext
 } from '../../../antlr/typescript/TypeScriptParser';
 import {TranscodeVisitor} from '../transcode-visitor';
 import {ParseTree, TerminalNode} from 'antlr4ts/tree';
@@ -53,6 +53,10 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
     switch (operation.text) {
       case '!': return UnaryLogicalOperation.NOT;
     }
+  }
+
+  visitVariableStatement(ctx: VariableStatementContext) {
+    return this.visit(ctx.getChild(1));
   }
 
   // Variable assignments and Function Calls
