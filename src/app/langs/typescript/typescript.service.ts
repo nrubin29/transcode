@@ -5,11 +5,12 @@ import {ProgramContext, TypeScriptParser} from '../../../antlr/typescript/TypeSc
 import {CharStreams, CommonTokenStream} from 'antlr4ts';
 import {TypeScriptLexer} from '../../../antlr/typescript/TypeScriptLexer';
 import {TranscodeTypeScriptVisitor} from './TranscodeTypeScriptVisitor';
+import {TypeScriptAstVisitor} from './TypeScriptAstVisitor';
 
 @Injectable({
   providedIn: 'root'
 })
-export class TypescriptService implements LanguageService<ProgramContext> {
+export class TypescriptService extends LanguageService<ProgramContext> {
 
   convertCodeToAntlr(code: string): ProgramContext {
     const inputStream = CharStreams.fromString(code);
@@ -26,6 +27,8 @@ export class TypescriptService implements LanguageService<ProgramContext> {
   }
 
   convertAstToCode(ast: Ast): string {
-    return '';
+    super.convertAstToCode(ast);
+    const visitor = new TypeScriptAstVisitor();
+    return visitor.visit(ast.root);
   }
 }

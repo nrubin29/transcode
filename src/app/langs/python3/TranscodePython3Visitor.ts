@@ -7,7 +7,7 @@ import {
   RootNode,
   UnaryLogicalOperation,
   ExpressionNode,
-  AssignmentNode, AtomNode, BinaryLogicalNode, UnaryLogicalNode
+  AssignmentNode, AtomNode, BinaryLogicalNode, UnaryLogicalNode, BooleanNode, StringNode
 } from '../ast';
 import {
   ArglistContext,
@@ -35,7 +35,7 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
     if (ctx.childCount === 2 && ctx.trailer().length > 0) {
       const name = this.visitAtom(ctx.atom());
       const args = this.visitTrailer(ctx.trailer()[0]);
-      return new FunctionCallNode(name, args);
+      return new FunctionCallNode(name, args as ExpressionNode[]);
     }
   }
 
@@ -54,7 +54,7 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       const left = this.visit(ctx.term()[0]);
       const right = this.visit(ctx.term()[1]);
       const operator = this.visitArithmeticOperation(ctx.getChild(1));
-      return new ArithmeticNode(left, right, operator);
+      return new ArithmeticNode(left as ExpressionNode, right as ExpressionNode, operator);
     }
   }
 
@@ -78,7 +78,7 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       const left = this.visit(ctx.testlist_star_expr(0));
       // Should be of type ExpressionNode
       const right = this.visit(ctx.testlist_star_expr(1));
-      return new AssignmentNode(left as AtomNode, right);
+      return new AssignmentNode(left as AtomNode, right as ExpressionNode);
     }
   }
 
@@ -87,7 +87,7 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       const left = this.visit(ctx.and_test(0));
       const right = this.visit(ctx.and_test(1));
       const operator = this.visitBinaryLogicalOperation(ctx.getChild(1));
-      return new BinaryLogicalNode(left, right, operator);
+      return new BinaryLogicalNode(left as ExpressionNode, right as ExpressionNode, operator);
     }
   }
 
@@ -96,7 +96,7 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       const left = this.visit(ctx.not_test(0));
       const right = this.visit(ctx.not_test(1));
       const operator = this.visitBinaryLogicalOperation(ctx.getChild(1));
-      return new BinaryLogicalNode(left, right, operator);
+      return new BinaryLogicalNode(left as ExpressionNode, right as ExpressionNode, operator);
     }
   }
 
@@ -104,8 +104,19 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
     if (ctx.childCount === 2) {
       const right = this.visit(ctx.not_test());
       const operator = this.visitUnaryLogicalOperation(ctx.getChild(0));
-      return new UnaryLogicalNode(right, operator);
+      return new UnaryLogicalNode(right as ExpressionNode, operator);
     }
   }
 
+  visitAtom(ctx: ParseTree): AtomNode {
+    if (ctx.text === 'True' || ctx.text === 'False') {
+      return new BooleanNode(ctx.text === 'True');
+    }
+
+    else if (ctx.text.startsWith('"') || ctx.text.startsWith('\'')) {
+      return new StringNode(ctx.text.substring(1, ctx.text.length - 1));
+    }
+
+    return super.visitAtom(ctx);
+  }
 }

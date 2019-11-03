@@ -10,7 +10,7 @@ import {Java9AstVisitor} from './Java9AstVisitor';
 @Injectable({
   providedIn: 'root'
 })
-export class JavaService implements LanguageService<ExpressionStatementContext> {
+export class JavaService extends LanguageService<ExpressionStatementContext> {
 
   convertCodeToAntlr(code: string): ExpressionStatementContext {
     const inputStream = CharStreams.fromString(code);
@@ -27,6 +27,7 @@ export class JavaService implements LanguageService<ExpressionStatementContext> 
   }
 
   convertAstToCode(ast: Ast): string {
+    super.convertAstToCode(ast);
     const visitor = new Java9AstVisitor();
     return visitor.visit(ast.root);
   }

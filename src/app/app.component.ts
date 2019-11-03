@@ -1,37 +1,109 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Python3Service} from './langs/python3/python3.service';
 import {JavaService} from './langs/java/java.service';
 import {TypescriptService} from './langs/typescript/typescript.service';
+import {LanguageService} from './langs/language-service';
+import {CodemirrorComponent} from './codemirror/codemirror.component';
+import {ParseTree} from 'antlr4ts/tree';
+import {Ast} from './langs/ast';
+import {MatDialog} from '@angular/material';
+import {TreesComponent} from './trees/trees.component';
+import {GifComponent} from './gif/gif.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  constructor(private python3: Python3Service, private java: JavaService, private typescript: TypescriptService) {}
+  sourceLanguage: LanguageInfo;
+  targetLanguage: LanguageInfo;
+
+  @ViewChild('source', {static: true}) source: CodemirrorComponent;
+  @ViewChild('target', {static: true}) target: CodemirrorComponent;
+
+  antlrTree: ParseTree;
+  ast: Ast;
+
+  languages: {[name: string]: LanguageInfo} = {
+    python3: {name: 'Python 3', mode: 'text/x-python', service: this.python3},
+    java: {name: 'Java', mode: 'text/x-java', service: this.java},
+    typeScript: {name: 'TypeScript', mode: 'text/typescript', service: this.typescript}
+  };
+
+  constructor(private python3: Python3Service, private java: JavaService, private typescript: TypescriptService, private dialog: MatDialog) {}
 
   ngOnInit() {
-    const pythonCode = `print(1 + 2 * 3)
-`;
-    const javaCode = `println(1 + 2 * 3);`;
-    const typescriptCode = `log(1 + 2 * 3)`;
+    this.sourceLanguage = this.languageValues[0];
+    this.targetLanguage = this.languageValues[1];
 
-    const pythonAst = this.python3.convertAntlrToAst(this.python3.convertCodeToAntlr(pythonCode));
-    const javaAst = this.java.convertAntlrToAst(this.java.convertCodeToAntlr(javaCode));
-    const tsAst = this.typescript.convertAntlrToAst(this.typescript.convertCodeToAntlr(typescriptCode));
+    this.source.writeValue('a = 10\n');
 
-    console.log('Python:');
-    console.log(pythonAst);
-    console.log();
-
-    console.log('Java:');
-    console.log(javaAst);
-    console.log(this.java.convertAstToCode(javaAst));
-    console.log();
-
-    console.log('TypeScript:');
-    console.log(tsAst);
-    console.log();
+//     const pythonCode = `print(1 + 2 * 3)
+// `;
+//     const javaCode = `println(1 + 2 * 3);`;
+//     const typescriptCode = `log(1 + 2 * 3)`;
+//
+//     const pythonAst = this.python3.convertAntlrToAst(this.python3.convertCodeToAntlr(pythonCode));
+//     const javaAst = this.java.convertAntlrToAst(this.java.convertCodeToAntlr(javaCode));
+//     const tsAst = this.typescript.convertAntlrToAst(this.typescript.convertCodeToAntlr(typescriptCode));
+//
+//     console.log('Python:');
+//     console.log(pythonAst);
+//     console.log(this.java.convertAstToCode(pythonAst));
+//     console.log();
+//
+//     console.log('Java:');
+//     console.log(javaAst);
+//     console.log(this.java.convertAstToCode(javaAst));
+//     console.log();
+//
+//     console.log('TypeScript:');
+//     console.log(tsAst);
+//     console.log();
   }
+
+  get languageValues() {
+    return Object.values(this.languages);
+  }
+
+  sourceChange() {
+    this.source.instance.setOption('mode', this.sourceLanguage.mode);
+  }
+
+  targetChange() {
+    this.target.instance.setOption('mode', this.targetLanguage.mode);
+  }
+
+  translate() {
+    const ref = this.dialog.open(GifComponent, {
+      data: {
+        from: this.sourceLanguage.name.toLowerCase(),
+        to: this.targetLanguage.name.toLowerCase()
+      }
+    });
+
+    setTimeout(() => {
+      this.antlrTree = this.sourceLanguage.service.convertCodeToAntlr(this.source.value);
+      this.ast = this.sourceLanguage.service.convertAntlrToAst(this.antlrTree);
+      this.target.writeValue(this.targetLanguage.service.convertAstToCode(this.ast));
+      ref.close();
+    }, 4000);
+  }
+
+  // showTrees() {
+  //   this.dialog.open(TreesComponent, {
+  //     width: '1024px',
+  //     data: {
+  //       antlrTree: this.antlrTree,
+  //       ast: this.ast
+  //     }
+  //   });
+  // }
+}
+
+interface LanguageInfo {
+  name: string;
+  mode: string;
+  service: LanguageService<any>;
 }

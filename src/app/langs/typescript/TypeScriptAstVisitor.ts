@@ -1,16 +1,16 @@
-import {AstVisitor} from '../ast-visitor';
+import {StringAstVisitor} from '../ast-visitor';
 import {
   ArithmeticNode, ArrayAccessNode,
   AssignmentNode,
   BinaryLogicalNode,
-  BinaryLogicalOperation,
+  BinaryLogicalOperation, BooleanNode,
   ComparisonNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode,
+  FunctionCallNode, IfStatementNode, PrimitiveType, StringNode, Type,
   UnaryLogicalNode,
   UnaryLogicalOperation, WhileLoopNode
 } from '../ast';
 
-export class TypeScriptAstVisitor extends AstVisitor {
+export class TypeScriptAstVisitor extends StringAstVisitor {
   visitArrayAccessNode(arrayAccess: ArrayAccessNode): string {
     return '';
   }
@@ -69,5 +69,31 @@ export class TypeScriptAstVisitor extends AstVisitor {
 
   visitUnaryLogicalOperation(operation: UnaryLogicalOperation): string {
     return '';
+  }
+
+  visitType(type: Type): string {
+    let typeName: string;
+
+    switch (type.type) {
+      case PrimitiveType.BOOLEAN: typeName = 'boolean'; break;
+      case PrimitiveType.FLOAT: typeName = 'number'; break;
+      case PrimitiveType.INTEGER: typeName = 'number'; break;
+      case PrimitiveType.OBJECT: typeName = 'object'; break;
+      case PrimitiveType.STRING: typeName = 'string'; break;
+    }
+
+    if (type.isArray) {
+      typeName += '[]';
+    }
+
+    return typeName;
+  }
+
+  visitBooleanNode(bool: BooleanNode): string {
+    return bool.value ? 'true' : 'false';
+  }
+
+  visitStringNode(str: StringNode): string {
+    return '\'' + str.atom + '\'';
   }
 }

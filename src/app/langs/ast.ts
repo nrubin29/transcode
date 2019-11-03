@@ -24,6 +24,19 @@ export enum ComparisonOperation {
   GREATER_THAN_EQUAL_TO = 'GREATER_THAN_EQUAL_TO'
 }
 
+export enum PrimitiveType {
+  INTEGER = 'INTEGER',
+  FLOAT = 'FLOAT',
+  BOOLEAN = 'BOOLEAN',
+  STRING = 'STRING',
+  OBJECT = 'OBJECT'
+}
+
+export interface Type {
+  type: PrimitiveType;
+  isArray: boolean;
+}
+
 export interface Ast {
   root: RootNode;
 }
@@ -37,6 +50,7 @@ export class RootNode extends Node {
 }
 
 export abstract class ExpressionNode extends Node {
+  type: Type;
   // protected constructor() { super(); }
 }
 
@@ -61,11 +75,11 @@ export class ComparisonNode extends ExpressionNode {
 }
 
 export class FunctionCallNode extends ExpressionNode {
-  constructor(public func: AtomNode, public args: ExpressionNode[]) { super(); }
+  constructor(public func: ExpressionNode, public args: ExpressionNode[]) { super(); }
 }
 
 export class DotAccessNode extends ExpressionNode {
-  constructor(public left: AtomNode, public right: ExpressionNode) { super(); }
+  constructor(public left: ExpressionNode, public right: AtomNode) { super(); }
 }
 
 export class ArrayAccessNode extends ExpressionNode {
@@ -73,7 +87,7 @@ export class ArrayAccessNode extends ExpressionNode {
 }
 
 export class IfStatementNode extends Node {
-  constructor(public condition: ExpressionNode, public statements: Node[]) { super(); }
+  constructor(public condition: ExpressionNode, public statements: Node[], public elseIfs: ElseIfStatementNode[] = [], public els?: ElseStatementNode) { super(); }
 }
 
 export class ElseIfStatementNode extends Node {
@@ -92,10 +106,6 @@ export class ForLoopNode extends Node {
   constructor(public controlVariable: AtomNode, public start: ExpressionNode, public stop: ExpressionNode, public step: ExpressionNode, public statements: Node[]) { super(); }
 }
 
-// export class EnhancedForLoopNode extends Node {
-//   constructor(public controlVariable: AtomNode, public iterable: ExpressionNode, public statements: Node[]) { super(); }
-// }
-
 /*
 Add support for:
  print
@@ -106,4 +116,12 @@ Add support for:
 
 export class AtomNode extends ExpressionNode {
   constructor(public atom: string) { super(); }
+}
+
+export class StringNode extends AtomNode {
+  constructor(str: string) { super(str); }
+}
+
+export class BooleanNode extends AtomNode {
+  constructor(public value: boolean) { super(value ? 'TRUE' : 'FALSE'); }
 }

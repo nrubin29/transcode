@@ -1,1 +1,33 @@
-<p>Look at the console output.</p>
+<div class="container">
+  <div class="flex display-side full">
+    <div>
+      <mat-form-field>
+        <mat-label>Source language</mat-label>
+        <mat-select [(value)]="sourceLanguage" (valueChange)="sourceChange()">
+          <mat-option *ngFor="let language of languageValues" [value]="language">{{language.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <app-codemirror #source [config]="{mode: sourceLanguage.mode}"></app-codemirror>
+    </div>
+    <div>
+      <mat-form-field>
+        <mat-label>Target language</mat-label>
+        <mat-select [(value)]="targetLanguage" (valueChange)="targetChange()">
+          <mat-option *ngFor="let language of languageValues" [value]="language">{{language.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <app-codemirror #target [config]="{mode: targetLanguage.mode, readOnly: true}"></app-codemirror>
+    </div>
+  </div>
+  <div class="flex right" style="margin-top: 1em">
+    <button mat-raised-button color="primary" (click)="translate()">Translate Code</button>
+  </div>
+<!--  <div class="flex display-side" style="margin-top: 1em">-->
+<!--    <div>-->
+<!--      <button mat-raised-button color="primary" (click)="showTrees()" [disabled]="!antlrTree || !ast">Show trees</button>-->
+<!--    </div>-->
+<!--    <div class="flex right">-->
+<!--      <button mat-raised-button color="primary" (click)="translate()">Translate Code</button>-->
+<!--    </div>-->
+<!--  </div>-->
+</div>

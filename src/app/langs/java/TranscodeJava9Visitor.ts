@@ -1,5 +1,14 @@
 import {Java9Visitor} from '../../../antlr/java/Java9Visitor';
-import {ArithmeticNode, BinaryLogicalOperation, ComparisonNode, FunctionCallNode, Node, RootNode, UnaryLogicalOperation} from '../ast';
+import {
+  ArithmeticNode,
+  BinaryLogicalOperation,
+  ComparisonNode,
+  ExpressionNode,
+  FunctionCallNode,
+  Node,
+  RootNode,
+  UnaryLogicalOperation
+} from '../ast';
 import {
   AdditiveExpressionContext,
   EqualityExpressionContext,
@@ -20,7 +29,7 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
   visitMethodInvocation(ctx: MethodInvocationContext) {
     const identifier = this.visitAtom(ctx.methodName());
     const args = ctx.argumentList().children.map(child => this.visit(child));
-    return new FunctionCallNode(identifier, args);
+    return new FunctionCallNode(identifier, args as ExpressionNode[]);
   }
 
   visitAdditiveExpression(ctx: AdditiveExpressionContext) {
@@ -28,7 +37,7 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
       const lhs = this.visit(ctx.additiveExpression());
       const rhs = this.visit(ctx.multiplicativeExpression());
       const operator = this.visitArithmeticOperation(ctx.getChild(1));
-      return new ArithmeticNode(lhs, rhs, operator);
+      return new ArithmeticNode(lhs as ExpressionNode, rhs as ExpressionNode, operator);
     }
   }
 
@@ -37,7 +46,7 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
       const lhs = this.visit(ctx.multiplicativeExpression());
       const rhs = this.visit(ctx.unaryExpression());
       const operator = this.visitArithmeticOperation(ctx.getChild(1));
-      return new ArithmeticNode(lhs, rhs, operator);
+      return new ArithmeticNode(lhs as ExpressionNode, rhs as ExpressionNode, operator);
     }
   }
 
@@ -46,7 +55,7 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
       const lhs = this.visit(ctx.equalityExpression());
       const rhs = this.visit(ctx.relationalExpression());
       const operator = this.visitComparisonOperation(ctx.getChild(1));
-      return new ComparisonNode(lhs, rhs, operator);
+      return new ComparisonNode(lhs as ExpressionNode, rhs as ExpressionNode, operator);
     }
   }
 
@@ -56,7 +65,7 @@ export class TranscodeJava9Visitor extends TranscodeVisitor implements Java9Visi
       const lhs = this.visit(ctx.relationalExpression());
       const rhs = this.visit(ctx.shiftExpression());
       const operator = this.visitComparisonOperation(ctx.getChild(1));
-      return new ComparisonNode(lhs, rhs, operator);
+      return new ComparisonNode(lhs as ExpressionNode, rhs as ExpressionNode, operator);
     }
   }
 

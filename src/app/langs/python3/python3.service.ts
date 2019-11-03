@@ -5,11 +5,12 @@ import {CharStreams, CommonTokenStream} from 'antlr4ts';
 import {Python3Lexer} from '../../../antlr/python3/Python3Lexer';
 import {File_inputContext, Python3Parser} from '../../../antlr/python3/Python3Parser';
 import {TranscodePython3Visitor} from './TranscodePython3Visitor';
+import {Python3AstVisitor} from './Python3AstVisitor';
 
 @Injectable({
   providedIn: 'root'
 })
-export class Python3Service implements LanguageService<File_inputContext> {
+export class Python3Service extends LanguageService<File_inputContext> {
 
   convertCodeToAntlr(code: string): File_inputContext {
     const inputStream = CharStreams.fromString(code);
@@ -22,10 +23,13 @@ export class Python3Service implements LanguageService<File_inputContext> {
   convertAntlrToAst(antlrRoot: File_inputContext): Ast {
     const visitor = new TranscodePython3Visitor();
     const root = visitor.visitFile_input(antlrRoot);
+    root.children.splice(root.children.length - 1, 1);
     return {root};
   }
 
   convertAstToCode(ast: Ast): string {
-    return JSON.stringify(ast.root);
+    super.convertAstToCode(ast);
+    const visitor = new Python3AstVisitor();
+    return visitor.visit(ast.root);
   }
 }

@@ -1,16 +1,16 @@
-import {AstVisitor} from '../ast-visitor';
+import {StringAstVisitor} from '../ast-visitor';
 import {
   ArithmeticNode, ArrayAccessNode,
   AssignmentNode,
   BinaryLogicalNode,
-  BinaryLogicalOperation,
+  BinaryLogicalOperation, BooleanNode,
   ComparisonNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode,
+  FunctionCallNode, IfStatementNode, PrimitiveType, StringNode, Type,
   UnaryLogicalNode,
   UnaryLogicalOperation, WhileLoopNode
 } from '../ast';
 
-export class Java9AstVisitor extends AstVisitor {
+export class Java9AstVisitor extends StringAstVisitor {
 
   visitFunctionCallNode(functionCall: FunctionCallNode): string {
     return this.visit(functionCall.func) + '(' + functionCall.args.map(child => this.visit(child)).join(', ') + ');';
@@ -21,7 +21,7 @@ export class Java9AstVisitor extends AstVisitor {
   }
 
   visitAssignmentNode(assignment: AssignmentNode): string {
-    return this.visit(assignment.name) + ' = ' + this.visit(assignment.value);
+    return this.visitType(assignment.value.type) + ' ' + this.visit(assignment.name) + ' = ' + this.visit(assignment.value) + ';';
   }
 
   visitBinaryLogicalNode(logic: BinaryLogicalNode): string {
@@ -75,5 +75,31 @@ export class Java9AstVisitor extends AstVisitor {
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
     return '';
+  }
+
+  visitBooleanNode(bool: BooleanNode): string {
+    return bool.value ? 'true' : 'false';
+  }
+
+  visitStringNode(str: StringNode): string {
+    return '"' + str.atom + '"';
+  }
+
+  visitType(type: Type): string {
+    let typeName: string;
+
+    switch (type.type) {
+      case PrimitiveType.BOOLEAN: typeName = 'boolean'; break;
+      case PrimitiveType.FLOAT: typeName = 'float'; break;
+      case PrimitiveType.INTEGER: typeName = 'int'; break;
+      case PrimitiveType.OBJECT: typeName = 'Object'; break;
+      case PrimitiveType.STRING: typeName = 'String'; break;
+    }
+
+    if (type.isArray) {
+      typeName += '[]';
+    }
+
+    return typeName;
   }
 }
