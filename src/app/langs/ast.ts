@@ -42,6 +42,8 @@ export interface Ast {
 }
 
 export abstract class Node {
+  depth = 0;
+
   protected constructor() {}
 }
 

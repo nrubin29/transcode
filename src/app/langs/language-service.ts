@@ -1,6 +1,7 @@
 import {Ast} from './ast';
 import {ParserRuleContext} from 'antlr4ts';
 import {TypeAstVisitor} from './type-ast-visitor';
+import {DepthAstVisitor} from './depth-ast-visitor';
 
 /**
  * The interface implemented by all services that provide a language.
@@ -13,8 +14,11 @@ export abstract class LanguageService<R extends ParserRuleContext> {
   convertAstToCode(ast: Ast): string {
     const typeVisitor = new TypeAstVisitor();
     typeVisitor.visit(ast.root);
-    console.log('added types');
-    console.log(ast.root);
+
+    const depthVisitor = new DepthAstVisitor();
+    depthVisitor.visit(ast.root);
+
+    console.log('pre-processed ast:', ast.root);
     return 'please override';
   }
 

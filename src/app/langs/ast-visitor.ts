@@ -68,6 +68,14 @@ export abstract class AstVisitor<T> {
 }
 
 export abstract class StringAstVisitor extends AstVisitor<string> {
+  visit(node: Node): string {
+    return this.indentation(node.depth) + super.visit(node);
+  }
+
+  indentation(depth: number) {
+    return '  '.repeat(depth);
+  }
+
   visitRootNode(root: RootNode): string {
     return root.children.map(child => this.visit(child)).join('\n');
   }

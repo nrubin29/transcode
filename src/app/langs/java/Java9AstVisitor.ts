@@ -87,23 +87,23 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n}' + (ifStatement.elseIfs.length > 0 ? '\n\n' : '') + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n\n') + (ifStatement.els ? '\n\n' + this.visit(ifStatement.els) : '');
+    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => this.visit(statement)) + '\n' + this.indentation(ifStatement.depth) + '}' + (ifStatement.elseIfs.length > 0 ? '\n\n' : '') + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n\n') + (ifStatement.els ? '\n\n' + this.visit(ifStatement.els) : '');
   }
 
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
-    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' + elseIfStatement.statements.map(statement => '  ' + this.visit(statement)).join('\n') + '\n}';
+    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' + elseIfStatement.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(elseIfStatement.depth) + '}';
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
-    return 'else {\n' + elseStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n}';
+    return 'else {\n' + elseStatement.statements.map(statement => this.visit(statement)) + '\n' + this.indentation(elseStatement.depth) + '}';
   }
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
-    return 'for (' + this.visitType(forLoopNode.start.type) + ' ' + this.visit(forLoopNode.controlVariable) + ' = ' + this.visit(forLoopNode.start) + '; ' + this.visit(forLoopNode.controlVariable) + ' < ' + this.visit(forLoopNode.stop) + '; ' + this.visit(forLoopNode.controlVariable) + ' += ' + this.visit(forLoopNode.step) + ') {\n' + forLoopNode.statements.map(statement => '  ' + this.visit(statement)).join('\n') + '\n}';
+    return 'for (' + this.visitType(forLoopNode.start.type) + ' ' + this.visit(forLoopNode.controlVariable) + ' = ' + this.visit(forLoopNode.start) + '; ' + this.visit(forLoopNode.controlVariable) + ' < ' + this.visit(forLoopNode.stop) + '; ' + this.visit(forLoopNode.controlVariable) + ' += ' + this.visit(forLoopNode.step) + ') {\n' + forLoopNode.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(forLoopNode.depth) + '}';
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
-    return 'while (' + this.visit(whileLoop.condition) + ') {\n' + whileLoop.statements.map(statement => '  ' + this.visit(statement)).join('\n') + '\n}';
+    return 'while (' + this.visit(whileLoop.condition) + ') {\n' + whileLoop.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(whileLoop.depth) + '}';
   }
 
   visitBooleanNode(bool: BooleanNode): string {

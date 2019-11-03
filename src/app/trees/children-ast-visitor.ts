@@ -15,7 +15,7 @@ import {AstVisitor} from '../langs/ast-visitor';
  */
 export class ChildrenAstVisitor extends AstVisitor<Node[]> {
   visitArithmeticNode(arithmetic: ArithmeticNode): Node[] {
-    return this.visit(arithmetic.left).concat(this.visit(arithmetic.operation)).concat(this.visit(arithmetic.right));
+    return this.visit(arithmetic.left).concat(this.visitArithmeticOperation(arithmetic.operation)).concat(this.visit(arithmetic.right));
   }
 
   visitArithmeticOperation(operation: ArithmeticOperation): any {
@@ -35,7 +35,7 @@ export class ChildrenAstVisitor extends AstVisitor<Node[]> {
   }
 
   visitBinaryLogicalNode(logic: BinaryLogicalNode): Node[] {
-    return this.visit(logic.left).concat(this.visit(logic.operation)).concat(this.visit(logic.right));
+    return this.visit(logic.left).concat(this.visitBinaryLogicalOperation(logic.operation)).concat(this.visit(logic.right));
   }
 
   visitBinaryLogicalOperation(operation: BinaryLogicalOperation): any {
@@ -43,7 +43,7 @@ export class ChildrenAstVisitor extends AstVisitor<Node[]> {
   }
 
   visitComparisonNode(comparison: ComparisonNode): Node[] {
-    return this.visit(comparison.left).concat(this.visit(comparison.operation)).concat(this.visit(comparison.right));
+    return this.visit(comparison.left).concat(this.visitComparisonOperation(comparison.operation)).concat(this.visit(comparison.right));
   }
 
   visitComparisonOperation(operation: ComparisonOperation): any {
@@ -67,7 +67,7 @@ export class ChildrenAstVisitor extends AstVisitor<Node[]> {
   }
 
   visitFunctionCallNode(functionCall: FunctionCallNode): any {
-    return this.visit(functionCall.func).concat(this.visit(functionCall.args));
+    return this.visit(functionCall.func).concat(...functionCall.args.map(arg => this.visit(arg)));
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): any {
@@ -79,7 +79,7 @@ export class ChildrenAstVisitor extends AstVisitor<Node[]> {
   }
 
   visitUnaryLogicalNode(logic: UnaryLogicalNode): any {
-    return this.visit(logic.operation).concat(this.visit(logic.left));
+    return this.visitUnaryLogicalOperation(logic.operation).concat(this.visit(logic.left));
   }
 
   visitUnaryLogicalOperation(operation: UnaryLogicalOperation): any {

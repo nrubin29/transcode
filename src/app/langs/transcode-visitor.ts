@@ -7,7 +7,7 @@ import {ArithmeticOperation, AtomNode, BinaryLogicalOperation, ComparisonOperati
 export abstract class TranscodeVisitor {
   visit(tree: ParseTree): Node {
     try {
-      const node = tree.accept(this as any);
+      const node: Node = tree.accept(this as any);
 
       if (!node) {
         // noinspection ExceptionCaughtLocallyJS
