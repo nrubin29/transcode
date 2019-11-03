@@ -77,8 +77,8 @@ export class Python3AstVisitor extends StringAstVisitor {
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
     return 'if ' + this.visit(ifStatement.condition) + ':\n' + ifStatement.statements.map(child => this.visit(child)).join('\n')
-       + '\n' + (ifStatement.elseIfs ? ifStatement.elseIfs.map(elseIfBlock => this.visit(elseIfBlock)).join('\n') : '')
-        + '\n' + (ifStatement.els ? this.visit(ifStatement.els) : '');
+       + (ifStatement.elseIfs.length > 0 ? '\n' + ifStatement.elseIfs.map(elseIfBlock => this.visit(elseIfBlock)).join('\n') : '')
+        + (ifStatement.els ? '\n' + this.visit(ifStatement.els) : '');
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
