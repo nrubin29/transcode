@@ -33,16 +33,6 @@ export class TypeScriptAstVisitor extends StringAstVisitor {
     return this.visit(dotAccess.left) + '.' + this.visit(dotAccess.right);
   }
 
-  visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
-    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' +
-        elseIfStatement.statements.map(stat => '\t' + this.visit(stat)).join('\n') +
-      '\n}';
-  }
-
-  visitElseStatementNode(elseStatement: ElseStatementNode): string {
-    return 'else {\n' + elseStatement.statements.map(stat => '\t' + this.visit(stat)).join('\n') + '\n}';
-  }
-
   visitForLoopNode(forLoopNode: ForLoopNode): string {
     const i = this.visit(forLoopNode.controlVariable)
     return 'for (let ' + i + ' = ' + this.visit(forLoopNode.start) + '; ' +
@@ -53,9 +43,15 @@ export class TypeScriptAstVisitor extends StringAstVisitor {
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return 'if ( ' + this.visit(ifStatement.condition) + ' ) {\n' +
-      ifStatement.statements.map(stat => '\t' + this.visit(stat)).join('\n') +
-      '\n}';
+    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n} ' + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n') + (ifStatement.els ? this.visit(ifStatement.els) : '');
+  }
+
+  visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
+    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' + elseIfStatement.statements.map(statement => '  ' + this.visit(statement)).join('\n') + '\n} ';
+  }
+
+  visitElseStatementNode(elseStatement: ElseStatementNode): string {
+    return 'else {\n' + elseStatement.statements.map(statement => '  ' + this.visit(statement)) + '\n}';
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
