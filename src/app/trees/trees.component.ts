@@ -1,5 +1,6 @@
 import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
-import {MAT_DIALOG_DATA, MatTabChangeEvent, MatTabGroup} from '@angular/material';
+import {MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {MatTabChangeEvent} from '@angular/material/tabs';
 import {Ast} from '../langs/ast';
 import {ParserRuleContext} from 'antlr4ts';
 import {TerminalNode} from 'antlr4ts/tree';

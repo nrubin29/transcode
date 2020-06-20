@@ -11,7 +11,7 @@ import { EditorConfiguration, EditorFromTextArea } from 'codemirror';
   styleUrls: ['./codemirror.component.scss']
 })
 export class CodemirrorComponent implements AfterViewInit {
-  @ViewChild('host', {static: false}) host: ElementRef;
+  @ViewChild('host') host: ElementRef;
   @Input() config: EditorConfiguration;
   @Output() instance: EditorFromTextArea;
   @Output() textChange = new EventEmitter<string>();

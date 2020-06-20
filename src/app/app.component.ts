@@ -6,7 +6,7 @@ import {LanguageService} from './langs/language-service';
 import {CodemirrorComponent} from './codemirror/codemirror.component';
 import {ParseTree} from 'antlr4ts/tree';
 import {Ast} from './langs/ast';
-import {MatDialog} from '@angular/material';
+import {MatDialog} from '@angular/material/dialog';
 import {TreesComponent} from './trees/trees.component';
 import {GifComponent} from './gif/gif.component';
 import {AboutComponent} from './about/about.component';
