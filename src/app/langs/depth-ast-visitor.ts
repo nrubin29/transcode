@@ -14,7 +14,7 @@ import {
   ElseStatementNode,
   ForLoopNode,
   FunctionCallNode,
-  IfStatementNode, InputNode, IntConversionNode,
+  IfStatementNode, InputNode, IntConversionNode, IntNode,
   PrimitiveType, PrintNode,
   RootNode, StatementNode,
   StringNode,
@@ -154,6 +154,9 @@ export class DepthAstVisitor extends AstVisitor<void> {
   }
 
   visitStringNode(str: StringNode): void {
+  }
+
+  visitIntNode(int: IntNode): void {
   }
 
   visitInputNode(input: InputNode): void {

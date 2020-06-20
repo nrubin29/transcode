@@ -7,7 +7,7 @@ import {
   BinaryLogicalOperation, BooleanNode,
   ComparisonNode,
   ComparisonOperation, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode,
+  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, IntNode,
   Node, PrintNode,
   RootNode, StatementNode, StringNode, Type,
   UnaryLogicalNode,
@@ -19,36 +19,35 @@ import {
  * {@code T} is the type that is returned by each visit() method.
  */
 export abstract class AstVisitor<T> {
-  // private readonly nodeVisitors: {[node: string]: (node: AstVisitor<T>) => (node: Node) => T};
-  //
-  // constructor() {
-  //   console.log('AtomNode', AtomNode.constructor.name);
-  //
-  //   this.nodeVisitors = {
-  //     [AtomNode.constructor.name]: (ths: AstVisitor<T>) => ths.visitAtomNode,
-  //     [BooleanNode.constructor.name]: (ths) => ths.visitBooleanNode,
-  //     [StringNode.constructor.name]: (ths) => ths.visitStringNode,
-  //     [RootNode.constructor.name]: (ths) => ths.visitRootNode,
-  //     [StatementNode.constructor.name]: (ths) => ths.visitStatementNode,
-  //     [DeclarationNode.constructor.name]: (ths) => ths.visitDeclarationNode,
-  //     [AssignmentNode.constructor.name]: (ths) => ths.visitAssignmentNode,
-  //     [ArithmeticNode.constructor.name]: (ths) => ths.visitArithmeticNode,
-  //     [UnaryLogicalNode.constructor.name]: (ths) => ths.visitUnaryLogicalNode,
-  //     [BinaryLogicalNode.constructor.name]: (ths) => ths.visitBinaryLogicalNode,
-  //     [ComparisonNode.constructor.name]: (ths) => ths.visitComparisonNode,
-  //     [FunctionCallNode.constructor.name]: (ths) => ths.visitFunctionCallNode,
-  //     [DotAccessNode.constructor.name]: (ths) => ths.visitDotAccessNode,
-  //     [ArrayAccessNode.constructor.name]: (ths) => ths.visitArrayAccessNode,
-  //     [IfStatementNode.constructor.name]: (ths) => ths.visitIfStatementNode,
-  //     [ElseIfStatementNode.constructor.name]: (ths) => ths.visitElseIfStatementNode,
-  //     [ElseStatementNode.constructor.name]: (ths) => ths.visitElseStatementNode,
-  //     [WhileLoopNode.constructor.name]: (ths) => ths.visitWhileLoopNode,
-  //     [ForLoopNode.constructor.name]: (ths) => ths.visitForLoopNode,
-  //     [PrintNode.constructor.name]: (ths) => ths.visitPrintNode,
-  //     [InputNode.constructor.name]: (ths) => ths.visitInputNode,
-  //     [IntConversionNode.constructor.name]: (ths) => ths.visitIntConversionNode
-  //   };
-  // }
+  private readonly nodeVisitors: {[node: string]: (node: AstVisitor<T>) => (node: Node) => T};
+
+  constructor() {
+    this.nodeVisitors = {
+      atom: (ths) => ths.visitAtomNode,
+      boolean: (ths) => ths.visitBooleanNode,
+      string: (ths) => ths.visitStringNode,
+      int: (ths) => ths.visitIntNode,
+      root: (ths) => ths.visitRootNode,
+      statement: (ths) => ths.visitStatementNode,
+      declaration: (ths) => ths.visitDeclarationNode,
+      assignment: (ths) => ths.visitAssignmentNode,
+      arithmetic: (ths) => ths.visitArithmeticNode,
+      unaryLogical: (ths) => ths.visitUnaryLogicalNode,
+      binaryLogical: (ths) => ths.visitBinaryLogicalNode,
+      comparison: (ths) => ths.visitComparisonNode,
+      functionCall: (ths) => ths.visitFunctionCallNode,
+      dotAccess: (ths) => ths.visitDotAccessNode,
+      arrayAccess: (ths) => ths.visitArrayAccessNode,
+      ifStatement: (ths) => ths.visitIfStatementNode,
+      elseIfStatement: (ths) => ths.visitElseIfStatementNode,
+      elseStatement: (ths) => ths.visitElseStatementNode,
+      whileLoop: (ths) => ths.visitWhileLoopNode,
+      forLoop: (ths) => ths.visitForLoopNode,
+      print: (ths) => ths.visitPrintNode,
+      input: (ths) => ths.visitInputNode,
+      intConversion: (ths) => ths.visitIntConversionNode
+    };
+  }
 
   visit(node: Node): T {
     if (this === undefined) {
@@ -59,16 +58,13 @@ export abstract class AstVisitor<T> {
       throw new Error('The generic visit() function doesn\'t work for enum values :(');
     }
 
-    // console.log(this.nodeVisitors);
-    console.log(node.constructor.name, node);
-
-    // return this.nodeVisitors[node.constructor.name](this)(node);
-    return this['visit' + node.constructor.name](node);
+    return this.nodeVisitors[node.nodeType](this).call(this, node);
   }
 
   abstract visitAtomNode(atom: AtomNode): T;
   abstract visitBooleanNode(bool: BooleanNode): T;
   abstract visitStringNode(str: StringNode): T;
+  abstract visitIntNode(int: IntNode): T;
 
   abstract visitRootNode(root: RootNode): T;
   abstract visitStatementNode(statement: StatementNode): T;

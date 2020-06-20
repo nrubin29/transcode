@@ -5,7 +5,7 @@ import {
   BinaryLogicalOperation, BooleanNode, ComparisonNode,
   ComparisonOperation, DeclarationNode, DotAccessNode,
   ElseIfStatementNode,
-  ElseStatementNode, ForLoopNode, FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, PrintNode,
+  ElseStatementNode, ForLoopNode, FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, IntNode, PrintNode,
   RootNode, StatementNode, StringNode, Type,
   UnaryLogicalNode, UnaryLogicalOperation, WhileLoopNode
 } from '../langs/ast';
@@ -174,6 +174,12 @@ export class TreantAstVisitor extends AstVisitor<object> {
   visitStringNode(str: StringNode): object {
     return {
       text: {name: str.atom},
+    };
+  }
+
+  visitIntNode(int: IntNode): object {
+    return {
+      text: {name: int.value}
     };
   }
 

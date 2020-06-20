@@ -8,15 +8,21 @@ import {
   BinaryLogicalOperation,
   BooleanNode,
   ComparisonNode,
-  ComparisonOperation, DeclarationNode,
+  ComparisonOperation,
+  DeclarationNode,
   DotAccessNode,
   ElseIfStatementNode,
   ElseStatementNode,
   ForLoopNode,
   FunctionCallNode,
-  IfStatementNode, InputNode, IntConversionNode,
-  PrimitiveType, PrintNode,
-  RootNode, StatementNode,
+  IfStatementNode,
+  InputNode,
+  IntConversionNode,
+  IntNode,
+  PrimitiveType,
+  PrintNode,
+  RootNode,
+  StatementNode,
   StringNode,
   Type,
   UnaryLogicalNode,
@@ -189,6 +195,10 @@ export class TypeAstVisitor extends AstVisitor<void> {
 
   visitStringNode(str: StringNode): void {
     str.type = {type: PrimitiveType.STRING, isArray: false};
+  }
+
+  visitIntNode(int: IntNode): void {
+    int.type = {type: PrimitiveType.INTEGER, isArray: false};
   }
 
   visitInputNode(input: InputNode): void {

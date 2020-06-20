@@ -17,7 +17,7 @@ import {
   ElseStatementNode,
   BooleanNode,
   StringNode,
-  PrintNode, InputNode, IntConversionNode, ElseIfStatementNode, StatementNode, ForLoopNode
+  PrintNode, InputNode, IntConversionNode, ElseIfStatementNode, StatementNode, ForLoopNode, IntNode
 } from '../ast';
 import {
   ArglistContext,
@@ -211,9 +211,9 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
 
   visitFor_stmt(ctx: For_stmtContext) {
     if (ctx.childCount === 6) {
-      let start: ExpressionNode = new AtomNode('0');
+      let start: ExpressionNode = new IntNode(0);
       let stop: ExpressionNode;
-      let step: ExpressionNode = new AtomNode('1');
+      let step: ExpressionNode = new IntNode(1);
       let forStatements: StatementNode[] = [];
       const controlVariable = this.visit(ctx.getChild(1));
       const rangeNode: FunctionCallNode = this.visit(ctx.getChild(3)) as FunctionCallNode;
@@ -223,7 +223,7 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       else {
         start = rangeNode.args[0];
         stop = rangeNode.args[1];
-        step = rangeNode.args.length === 3 ? rangeNode.args[2] : new AtomNode('1');
+        step = rangeNode.args.length === 3 ? rangeNode.args[2] : new IntNode(1);
       }
       ctx.suite(0).stmt().map(item => forStatements.push(this.visit(item) as StatementNode));
       return new ForLoopNode(controlVariable as AtomNode, start, stop, step, forStatements);

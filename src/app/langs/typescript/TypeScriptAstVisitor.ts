@@ -12,7 +12,7 @@ import {
   ElseStatementNode,
   ForLoopNode,
   FunctionCallNode,
-  IfStatementNode, InputNode, IntConversionNode,
+  IfStatementNode, InputNode, IntConversionNode, IntNode,
   PrimitiveType, PrintNode, StatementNode,
   StringNode,
   Type,
@@ -135,6 +135,10 @@ export class TypeScriptAstVisitor extends StringAstVisitor {
 
   visitStringNode(str: StringNode): string {
     return '\'' + str.atom + '\'';
+  }
+
+  visitIntNode(int: IntNode): string {
+    return int.atom;
   }
 
   visitInputNode(input: InputNode): string {

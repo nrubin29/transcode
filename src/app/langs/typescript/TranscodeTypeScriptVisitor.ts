@@ -8,7 +8,7 @@ import {
   ComparisonNode, DeclarationNode,
   DotAccessNode, ElseIfStatementNode, ElseStatementNode,
   ExpressionNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode,
+  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, IntNode,
   Node, PrintNode,
   RootNode, StatementNode, StringNode,
   UnaryLogicalNode,
@@ -213,7 +213,7 @@ export class TranscodeTypeScriptVisitor extends TranscodeVisitor implements Type
     const name = this.visit(ctx.getChild(2).getChild(0).getChild(1).getChild(0));
     const start = this.visit(ctx.getChild(2).getChild(0).getChild(1).getChild(2));
     const comp = this.visit(ctx.getChild(4)) as ComparisonNode;
-    const step = new AtomNode('1');
+    const step = new IntNode(1);
     const statements = this.visit(ctx.getChild(8)) as unknown as StatementNode[];
     const stop = comp.right;
     return new ForLoopNode(name as AtomNode, start as ExpressionNode, stop, step, statements);

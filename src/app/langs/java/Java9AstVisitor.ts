@@ -1,13 +1,31 @@
 import {StringAstVisitor} from '../ast-visitor';
 import {
-  ArithmeticNode, ArrayAccessNode,
+  ArithmeticNode,
+  ArrayAccessNode,
   AssignmentNode,
   BinaryLogicalNode,
-  BinaryLogicalOperation, BooleanNode,
-  ComparisonNode, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, PrimitiveType, PrintNode, RootNode, StatementNode, StringNode, Type,
+  BinaryLogicalOperation,
+  BooleanNode,
+  ComparisonNode,
+  DeclarationNode,
+  DotAccessNode,
+  ElseIfStatementNode,
+  ElseStatementNode,
+  ForLoopNode,
+  FunctionCallNode,
+  IfStatementNode,
+  InputNode,
+  IntConversionNode,
+  IntNode,
+  PrimitiveType,
+  PrintNode,
+  RootNode,
+  StatementNode,
+  StringNode,
+  Type,
   UnaryLogicalNode,
-  UnaryLogicalOperation, WhileLoopNode
+  UnaryLogicalOperation,
+  WhileLoopNode
 } from '../ast';
 
 export class Java9AstVisitor extends StringAstVisitor {
@@ -112,6 +130,10 @@ export class Java9AstVisitor extends StringAstVisitor {
 
   visitStringNode(str: StringNode): string {
     return '"' + str.atom + '"';
+  }
+
+  visitIntNode(int: IntNode): string {
+    return int.atom;
   }
 
   visitInputNode(input: InputNode): string {

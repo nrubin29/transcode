@@ -5,7 +5,7 @@ import {
   BinaryLogicalNode,
   BinaryLogicalOperation, BooleanNode,
   ComparisonNode, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, PrimitiveType, PrintNode, StatementNode, StringNode, Type,
+  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, IntNode, PrimitiveType, PrintNode, StatementNode, StringNode, Type,
   UnaryLogicalNode,
   UnaryLogicalOperation, WhileLoopNode
 } from '../ast';
@@ -91,6 +91,10 @@ export class Python3AstVisitor extends StringAstVisitor {
 
   visitStringNode(str: StringNode): string {
     return '\'' + str.atom + '\'';
+  }
+
+  visitIntNode(int: IntNode): string {
+    return int.atom;
   }
 
   visitType(type: Type): string {
