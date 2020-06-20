@@ -30,6 +30,7 @@ import {AstVisitor} from './ast-visitor';
  */
 export class DepthAstVisitor extends AstVisitor<void> {
   visitStatementNode(statement: StatementNode): void {
+    statement.node.depth = statement.depth;
     this.visit(statement.node);
   }
 

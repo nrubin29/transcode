@@ -19,18 +19,50 @@ import {
  * {@code T} is the type that is returned by each visit() method.
  */
 export abstract class AstVisitor<T> {
+  // private readonly nodeVisitors: {[node: string]: (node: AstVisitor<T>) => (node: Node) => T};
+  //
+  // constructor() {
+  //   console.log('AtomNode', AtomNode.constructor.name);
+  //
+  //   this.nodeVisitors = {
+  //     [AtomNode.constructor.name]: (ths: AstVisitor<T>) => ths.visitAtomNode,
+  //     [BooleanNode.constructor.name]: (ths) => ths.visitBooleanNode,
+  //     [StringNode.constructor.name]: (ths) => ths.visitStringNode,
+  //     [RootNode.constructor.name]: (ths) => ths.visitRootNode,
+  //     [StatementNode.constructor.name]: (ths) => ths.visitStatementNode,
+  //     [DeclarationNode.constructor.name]: (ths) => ths.visitDeclarationNode,
+  //     [AssignmentNode.constructor.name]: (ths) => ths.visitAssignmentNode,
+  //     [ArithmeticNode.constructor.name]: (ths) => ths.visitArithmeticNode,
+  //     [UnaryLogicalNode.constructor.name]: (ths) => ths.visitUnaryLogicalNode,
+  //     [BinaryLogicalNode.constructor.name]: (ths) => ths.visitBinaryLogicalNode,
+  //     [ComparisonNode.constructor.name]: (ths) => ths.visitComparisonNode,
+  //     [FunctionCallNode.constructor.name]: (ths) => ths.visitFunctionCallNode,
+  //     [DotAccessNode.constructor.name]: (ths) => ths.visitDotAccessNode,
+  //     [ArrayAccessNode.constructor.name]: (ths) => ths.visitArrayAccessNode,
+  //     [IfStatementNode.constructor.name]: (ths) => ths.visitIfStatementNode,
+  //     [ElseIfStatementNode.constructor.name]: (ths) => ths.visitElseIfStatementNode,
+  //     [ElseStatementNode.constructor.name]: (ths) => ths.visitElseStatementNode,
+  //     [WhileLoopNode.constructor.name]: (ths) => ths.visitWhileLoopNode,
+  //     [ForLoopNode.constructor.name]: (ths) => ths.visitForLoopNode,
+  //     [PrintNode.constructor.name]: (ths) => ths.visitPrintNode,
+  //     [InputNode.constructor.name]: (ths) => ths.visitInputNode,
+  //     [IntConversionNode.constructor.name]: (ths) => ths.visitIntConversionNode
+  //   };
+  // }
 
   visit(node: Node): T {
     if (this === undefined) {
       throw new Error('You have to write lambda expressions as thing => this.visit(thing). Shortcuts are for the weak.');
     }
 
-    else if (typeof node === 'number') {
+    else if (typeof node === 'string') {
       throw new Error('The generic visit() function doesn\'t work for enum values :(');
     }
 
+    // console.log(this.nodeVisitors);
     console.log(node.constructor.name, node);
 
+    // return this.nodeVisitors[node.constructor.name](this)(node);
     return this['visit' + node.constructor.name](node);
   }
 
@@ -68,6 +100,7 @@ export abstract class AstVisitor<T> {
 }
 
 export abstract class StringAstVisitor extends AstVisitor<string> {
+
   visit(node: Node): string {
     return this.indentation(node.depth) + super.visit(node);
   }

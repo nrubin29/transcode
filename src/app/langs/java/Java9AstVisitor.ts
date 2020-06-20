@@ -129,7 +129,7 @@ export class Java9AstVisitor extends StringAstVisitor {
     }
 
     else {
-      return print.args.map(pr => 'System.out.println(' + this.visit(pr) + ')').join(';\n');
+      return print.args.map((pr, i) => (i !== 0 ? this.indentation(print.depth) : '') + 'System.out.println(' + this.visit(pr) + ');').join('\n');
     }
   }
 
