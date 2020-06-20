@@ -1,23 +1,45 @@
-import {StringAstVisitor} from '../ast-visitor';
+import { StringAstVisitor } from '../ast-visitor';
 import {
-  ArithmeticNode, ArrayAccessNode,
+  ArithmeticNode,
+  ArrayAccessNode,
   AssignmentNode,
   BinaryLogicalNode,
-  BinaryLogicalOperation, BooleanNode,
-  ComparisonNode, DeclarationNode, DotAccessNode, ElseIfStatementNode, ElseStatementNode, ForLoopNode,
-  FunctionCallNode, IfStatementNode, InputNode, IntConversionNode, IntNode, PrimitiveType, PrintNode, StatementNode, StringNode, Type,
+  BinaryLogicalOperation,
+  BooleanNode,
+  ComparisonNode,
+  DeclarationNode,
+  DotAccessNode,
+  ElseIfStatementNode,
+  ElseStatementNode,
+  ForLoopNode,
+  FunctionCallNode,
+  IfStatementNode,
+  InputNode,
+  IntConversionNode,
+  IntNode,
+  PrimitiveType,
+  PrintNode,
+  StatementNode,
+  StringNode,
+  Type,
   UnaryLogicalNode,
-  UnaryLogicalOperation, WhileLoopNode
+  UnaryLogicalOperation,
+  WhileLoopNode,
 } from '../ast';
 
 export class Python3AstVisitor extends StringAstVisitor {
-
   visitStatementNode(statement: StatementNode): string {
     return this.visit(statement.node);
   }
 
   visitArithmeticNode(arithmetic: ArithmeticNode): string {
-    return this.visit(arithmetic.left) + ' ' + this.visitArithmeticOperation(arithmetic.operation) + ' ' + this.visit(arithmetic.right);
+    return (
+      this.visit(arithmetic.left) +
+      ' ' +
+      this.visitArithmeticOperation(arithmetic.operation) +
+      ' ' +
+      this.visit(arithmetic.right)
+    );
   }
 
   visitAssignmentNode(assignment: AssignmentNode): string {
@@ -25,30 +47,53 @@ export class Python3AstVisitor extends StringAstVisitor {
   }
 
   visitBinaryLogicalNode(logic: BinaryLogicalNode): string {
-    return this.visit(logic.left) + ' ' + this.visitBinaryLogicalOperation(logic.operation) + ' ' + this.visit(logic.right);
+    return (
+      this.visit(logic.left) +
+      ' ' +
+      this.visitBinaryLogicalOperation(logic.operation) +
+      ' ' +
+      this.visit(logic.right)
+    );
   }
 
   visitBinaryLogicalOperation(operation: BinaryLogicalOperation): string {
     switch (operation) {
-      case BinaryLogicalOperation.AND: return 'and';
-      case BinaryLogicalOperation.OR: return 'or';
-    }  }
+      case BinaryLogicalOperation.AND:
+        return 'and';
+      case BinaryLogicalOperation.OR:
+        return 'or';
+    }
+  }
 
   visitComparisonNode(comparison: ComparisonNode): string {
-    return this.visit(comparison.left) + ' ' + this.visitComparisonOperation(comparison.operation) + ' ' + this.visit(comparison.right);
+    return (
+      this.visit(comparison.left) +
+      ' ' +
+      this.visitComparisonOperation(comparison.operation) +
+      ' ' +
+      this.visit(comparison.right)
+    );
   }
 
   visitFunctionCallNode(functionCall: FunctionCallNode): string {
-    return this.visit(functionCall.func) + '(' + functionCall.args.map(child => this.visit(child)).join(', ') + ')';
+    return (
+      this.visit(functionCall.func) +
+      '(' +
+      functionCall.args.map((child) => this.visit(child)).join(', ') +
+      ')'
+    );
   }
 
   visitUnaryLogicalNode(logic: UnaryLogicalNode): string {
-    return this.visitUnaryLogicalOperation(logic.operation) + this.visit(logic.left);
+    return (
+      this.visitUnaryLogicalOperation(logic.operation) + this.visit(logic.left)
+    );
   }
 
   visitUnaryLogicalOperation(operation: UnaryLogicalOperation): string {
     switch (operation) {
-      case UnaryLogicalOperation.NOT: return 'not';
+      case UnaryLogicalOperation.NOT:
+        return 'not';
     }
   }
 
@@ -61,24 +106,53 @@ export class Python3AstVisitor extends StringAstVisitor {
   }
 
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
-    return 'elif ' + this.visit(elseIfStatement.condition) + ':\n'
-      + elseIfStatement.statements.map(child => this.visit(child)).join('\n');
+    return (
+      'elif ' +
+      this.visit(elseIfStatement.condition) +
+      ':\n' +
+      elseIfStatement.statements.map((child) => this.visit(child)).join('\n')
+    );
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
-    return 'else:\n' + elseStatement.statements.map(child => this.visit(child)).join('\n');
+    return (
+      'else:\n' +
+      elseStatement.statements.map((child) => this.visit(child)).join('\n')
+    );
   }
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
-    return 'for ' + forLoopNode.controlVariable.atom + ' in range(' + (this.visit(forLoopNode.start) ? this.visit(forLoopNode.start) + ', ' : '')
-      + this.visit(forLoopNode.stop) + (this.visit(forLoopNode.step) === '1' ? '' : ', ' + this.visit(forLoopNode.step)) + '):'
-      + '\n' + forLoopNode.statements.map(child => this.visit(child)).join('\n');
+    return (
+      'for ' +
+      forLoopNode.controlVariable.atom +
+      ' in range(' +
+      (this.visit(forLoopNode.start)
+        ? this.visit(forLoopNode.start) + ', '
+        : '') +
+      this.visit(forLoopNode.stop) +
+      (this.visit(forLoopNode.step) === '1'
+        ? ''
+        : ', ' + this.visit(forLoopNode.step)) +
+      '):' +
+      '\n' +
+      forLoopNode.statements.map((child) => this.visit(child)).join('\n')
+    );
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return 'if ' + this.visit(ifStatement.condition) + ':\n' + ifStatement.statements.map(child => this.visit(child)).join('\n')
-       + (ifStatement.elseIfs.length > 0 ? '\n' + ifStatement.elseIfs.map(elseIfBlock => this.visit(elseIfBlock)).join('\n') : '')
-        + (ifStatement.els ? '\n' + this.visit(ifStatement.els) : '');
+    return (
+      'if ' +
+      this.visit(ifStatement.condition) +
+      ':\n' +
+      ifStatement.statements.map((child) => this.visit(child)).join('\n') +
+      (ifStatement.elseIfs.length > 0
+        ? '\n' +
+          ifStatement.elseIfs
+            .map((elseIfBlock) => this.visit(elseIfBlock))
+            .join('\n')
+        : '') +
+      (ifStatement.els ? '\n' + this.visit(ifStatement.els) : '')
+    );
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
@@ -90,7 +164,7 @@ export class Python3AstVisitor extends StringAstVisitor {
   }
 
   visitStringNode(str: StringNode): string {
-    return '\'' + str.atom + '\'';
+    return "'" + str.atom + "'";
   }
 
   visitIntNode(int: IntNode): string {
@@ -105,11 +179,21 @@ export class Python3AstVisitor extends StringAstVisitor {
     }
 
     switch (type.type) {
-      case PrimitiveType.BOOLEAN: typeName += 'bool'; break;
-      case PrimitiveType.FLOAT: typeName += 'float'; break;
-      case PrimitiveType.INTEGER: typeName += 'int'; break;
-      case PrimitiveType.OBJECT: typeName += 'object'; break;
-      case PrimitiveType.STRING: typeName += 'str'; break;
+      case PrimitiveType.BOOLEAN:
+        typeName += 'bool';
+        break;
+      case PrimitiveType.FLOAT:
+        typeName += 'float';
+        break;
+      case PrimitiveType.INTEGER:
+        typeName += 'int';
+        break;
+      case PrimitiveType.OBJECT:
+        typeName += 'object';
+        break;
+      case PrimitiveType.STRING:
+        typeName += 'str';
+        break;
     }
 
     if (type.isArray) {
@@ -132,7 +216,8 @@ export class Python3AstVisitor extends StringAstVisitor {
   }
 
   visitPrintNode(print: PrintNode): string {
-    return 'print(' + print.args.map(child => this.visit(child)).join(', ') + ')';
+    return (
+      'print(' + print.args.map((child) => this.visit(child)).join(', ') + ')'
+    );
   }
-
 }

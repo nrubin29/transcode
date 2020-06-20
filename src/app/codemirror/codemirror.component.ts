@@ -1,14 +1,22 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import * as CodeMirror from 'codemirror';
+import { EditorConfiguration, EditorFromTextArea } from 'codemirror';
 import 'codemirror/mode/python/python';
 import 'codemirror/mode/clike/clike';
 import 'codemirror/mode/javascript/javascript';
-import { EditorConfiguration, EditorFromTextArea } from 'codemirror';
 
 @Component({
   selector: 'app-codemirror',
   templateUrl: './codemirror.component.html',
-  styleUrls: ['./codemirror.component.scss']
+  styleUrls: ['./codemirror.component.scss'],
 })
 export class CodemirrorComponent implements AfterViewInit {
   @ViewChild('host') host: ElementRef;
@@ -18,7 +26,9 @@ export class CodemirrorComponent implements AfterViewInit {
 
   private _value = '';
 
-  get value() { return this._value; }
+  get value() {
+    return this._value;
+  }
 
   @Input() set value(v) {
     if (v !== this._value) {
@@ -28,7 +38,11 @@ export class CodemirrorComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.config = this.config || {};
-    this.instance = CodeMirror.fromTextArea(this.host.nativeElement, {lineNumbers: true, lineWrapping: true, ...this.config});
+    this.instance = CodeMirror.fromTextArea(this.host.nativeElement, {
+      lineNumbers: true,
+      lineWrapping: true,
+      ...this.config,
+    });
     this.instance.setValue(this._value);
 
     this.instance.on('change', () => {

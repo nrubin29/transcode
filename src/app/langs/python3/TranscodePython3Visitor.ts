@@ -1,58 +1,61 @@
 /* tslint:disable:prefer-const */
-import {Python3Visitor} from '../../../antlr/python3/Python3Visitor';
+import { Python3Visitor } from '../../../antlr/python3/Python3Visitor';
 import {
   ArithmeticNode,
-  BinaryLogicalOperation,
-  FunctionCallNode,
-  Node,
-  RootNode,
-  UnaryLogicalOperation,
-  ExpressionNode,
   AssignmentNode,
   AtomNode,
   BinaryLogicalNode,
-  UnaryLogicalNode,
-  ComparisonNode,
-  IfStatementNode,
-  ElseStatementNode,
+  BinaryLogicalOperation,
   BooleanNode,
+  ComparisonNode,
+  ElseIfStatementNode,
+  ElseStatementNode,
+  ExpressionNode,
+  ForLoopNode,
+  FunctionCallNode,
+  IfStatementNode,
+  InputNode,
+  IntConversionNode,
+  IntNode,
+  Node,
+  PrintNode,
+  RootNode,
+  StatementNode,
   StringNode,
-  PrintNode, InputNode, IntConversionNode, ElseIfStatementNode, StatementNode, ForLoopNode, IntNode
+  UnaryLogicalNode,
+  UnaryLogicalOperation,
 } from '../ast';
 import {
-  ArglistContext,
-  StmtContext,
-  Arith_exprContext,
-  AtomContext,
-  File_inputContext,
-  PowerContext,
-  TrailerContext,
-  Expr_stmtContext,
-  Testlist_star_exprContext,
-  Or_testContext,
   And_testContext,
-  Not_testContext,
+  ArglistContext,
+  Arith_exprContext,
   ComparisonContext,
-  If_stmtContext,
+  Expr_stmtContext,
+  File_inputContext,
   For_stmtContext,
+  If_stmtContext,
+  Not_testContext,
+  Or_testContext,
+  PowerContext,
+  StmtContext,
   TermContext,
+  TrailerContext,
 } from '../../../antlr/python3/Python3Parser';
-import {TranscodeVisitor} from '../transcode-visitor';
-import {ParseTree} from 'antlr4ts/tree';
-import {Statement} from '@angular/compiler';
-import {range} from 'rxjs';
+import { TranscodeVisitor } from '../transcode-visitor';
+import { ParseTree } from 'antlr4ts/tree';
 
-export class TranscodePython3Visitor extends TranscodeVisitor implements Python3Visitor<Node> {
-
+export class TranscodePython3Visitor extends TranscodeVisitor
+  implements Python3Visitor<Node> {
   visitFile_input(ctx: File_inputContext) {
-    return new RootNode(ctx.children.map(child => this.visit(child)) as StatementNode[]);
+    return new RootNode(
+      ctx.children.map((child) => this.visit(child)) as StatementNode[]
+    );
   }
 
   visitStmt(ctx: StmtContext) {
     if (ctx.compound_stmt()) {
       return undefined;
-    }
-    else {
+    } else {
       return new StatementNode(this.visit(ctx.getChild(0)));
     }
   }
@@ -63,16 +66,13 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       const args = this.visitTrailer(ctx.trailer()[0]);
       if (name.atom === 'print') {
         return new PrintNode(args as ExpressionNode[]);
-      }
-      else if (name.atom === 'input') {
+      } else if (name.atom === 'input') {
         return new InputNode();
-      }
-      else if (name.atom === 'int') {
+      } else if (name.atom === 'int') {
         return new IntConversionNode(args[0] as ExpressionNode);
       }
       return new FunctionCallNode(name, args as ExpressionNode[]);
     }
-
   }
 
   visitTrailer(ctx: TrailerContext) {
@@ -82,7 +82,7 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
   }
 
   visitArglist(ctx: ArglistContext): any {
-    return ctx.argument().map(a => this.visit(a));
+    return ctx.argument().map((a) => this.visit(a));
   }
 
   // TODO: Add multiple operand support
@@ -91,7 +91,11 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       const left = this.visit(ctx.term()[0]);
       const right = this.visit(ctx.term()[1]);
       const operator = this.visitArithmeticOperation(ctx.getChild(1));
-      return new ArithmeticNode(left as ExpressionNode, right as ExpressionNode, operator);
+      return new ArithmeticNode(
+        left as ExpressionNode,
+        right as ExpressionNode,
+        operator
+      );
     }
   }
 
@@ -100,20 +104,27 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       const left = this.visit(ctx.factor(0));
       const right = this.visit(ctx.factor(1));
       const operator = this.visitArithmeticOperation(ctx.getChild(1));
-      return new ArithmeticNode(left as ExpressionNode, right as ExpressionNode, operator);
+      return new ArithmeticNode(
+        left as ExpressionNode,
+        right as ExpressionNode,
+        operator
+      );
     }
   }
 
   visitBinaryLogicalOperation(operation: ParseTree): BinaryLogicalOperation {
     switch (operation.text) {
-      case 'and': return BinaryLogicalOperation.AND;
-      case 'or': return BinaryLogicalOperation.OR;
+      case 'and':
+        return BinaryLogicalOperation.AND;
+      case 'or':
+        return BinaryLogicalOperation.OR;
     }
   }
 
   visitUnaryLogicalOperation(operation: ParseTree): UnaryLogicalOperation {
     switch (operation.text) {
-      case 'not': return UnaryLogicalOperation.NOT;
+      case 'not':
+        return UnaryLogicalOperation.NOT;
     }
   }
 
@@ -128,11 +139,15 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
   }
 
   visitOr_test(ctx: Or_testContext) {
-      if (ctx.childCount === 3) {
+    if (ctx.childCount === 3) {
       const left = this.visit(ctx.and_test(0));
       const right = this.visit(ctx.and_test(1));
       const operator = this.visitBinaryLogicalOperation(ctx.getChild(1));
-      return new BinaryLogicalNode(left as ExpressionNode, right as ExpressionNode, operator);
+      return new BinaryLogicalNode(
+        left as ExpressionNode,
+        right as ExpressionNode,
+        operator
+      );
     }
   }
 
@@ -141,7 +156,11 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       const left = this.visit(ctx.not_test(0));
       const right = this.visit(ctx.not_test(1));
       const operator = this.visitBinaryLogicalOperation(ctx.getChild(1));
-      return new BinaryLogicalNode(left as ExpressionNode, right as ExpressionNode, operator);
+      return new BinaryLogicalNode(
+        left as ExpressionNode,
+        right as ExpressionNode,
+        operator
+      );
     }
   }
 
@@ -158,14 +177,18 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       const left = this.visit(ctx.star_expr(0));
       const right = this.visit(ctx.star_expr(1));
       const operator = this.visitComparisonOperation(ctx.comp_op(0));
-      return new ComparisonNode(left as ExpressionNode, right as ExpressionNode, operator);
+      return new ComparisonNode(
+        left as ExpressionNode,
+        right as ExpressionNode,
+        operator
+      );
     }
   }
 
   visitAtom(ctx: ParseTree): AtomNode {
     if (ctx.text === 'True' || ctx.text === 'False') {
       return new BooleanNode(ctx.text === 'True');
-    } else if (ctx.text.startsWith('"') || ctx.text.startsWith('\'')) {
+    } else if (ctx.text.startsWith('"') || ctx.text.startsWith("'")) {
       return new StringNode(ctx.text.substring(1, ctx.text.length - 1));
     }
 
@@ -179,32 +202,64 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
     let condition;
     if (ctx.childCount === 4) {
       condition = this.visit(ctx.test(0));
-      ctx.suite(0).stmt().map(item => ifStatement.push(this.visit(item) as StatementNode));
+      ctx
+        .suite(0)
+        .stmt()
+        .map((item) => ifStatement.push(this.visit(item) as StatementNode));
       return new IfStatementNode(condition, ifStatement);
     } else if (ctx.childCount === 7) {
       condition = this.visit(ctx.test(0));
-      ctx.suite(0).stmt().map(item => ifStatement.push(this.visit(item) as StatementNode));
-      ctx.suite(1).stmt().map(item => elseStatement.push(this.visit(item) as StatementNode));
-      return new IfStatementNode(condition, ifStatement, [],  new ElseStatementNode(elseStatement));
-    }
-    else if (ctx.childCount > 7) {
+      ctx
+        .suite(0)
+        .stmt()
+        .map((item) => ifStatement.push(this.visit(item) as StatementNode));
+      ctx
+        .suite(1)
+        .stmt()
+        .map((item) => elseStatement.push(this.visit(item) as StatementNode));
+      return new IfStatementNode(
+        condition,
+        ifStatement,
+        [],
+        new ElseStatementNode(elseStatement)
+      );
+    } else if (ctx.childCount > 7) {
       let elseIfs: ElseIfStatementNode[] = [];
       const ifCondition = this.visit(ctx.test(0));
-      ctx.suite(0).stmt().map(item => ifStatement.push(this.visit(item) as StatementNode));
+      ctx
+        .suite(0)
+        .stmt()
+        .map((item) => ifStatement.push(this.visit(item) as StatementNode));
       // Constructing elseifsNode
       for (let i = 1; i < ctx.test().length; i++) {
         const elseIfCondition = this.visit(ctx.test(i));
         let statements: StatementNode[] = [];
-        ctx.suite(i).stmt().map(item => statements.push(this.visit(item) as StatementNode));
-        elseIfs.push(new ElseIfStatementNode(elseIfCondition as ExpressionNode, statements));
+        ctx
+          .suite(i)
+          .stmt()
+          .map((item) => statements.push(this.visit(item) as StatementNode));
+        elseIfs.push(
+          new ElseIfStatementNode(elseIfCondition as ExpressionNode, statements)
+        );
       }
       if (ctx.ELSE()) {
         console.log('HERE: ', ctx.ELSE());
-        ctx.suite(ctx.suite().length - 1).stmt().map(item => elseStatement.push(this.visit(item) as StatementNode));
-        return new IfStatementNode(ifCondition as ExpressionNode, ifStatement, elseIfs, new ElseStatementNode(elseStatement));
-      }
-      else {
-        return new IfStatementNode(ifCondition as ExpressionNode, ifStatement, elseIfs);
+        ctx
+          .suite(ctx.suite().length - 1)
+          .stmt()
+          .map((item) => elseStatement.push(this.visit(item) as StatementNode));
+        return new IfStatementNode(
+          ifCondition as ExpressionNode,
+          ifStatement,
+          elseIfs,
+          new ElseStatementNode(elseStatement)
+        );
+      } else {
+        return new IfStatementNode(
+          ifCondition as ExpressionNode,
+          ifStatement,
+          elseIfs
+        );
       }
     }
   }
@@ -216,17 +271,27 @@ export class TranscodePython3Visitor extends TranscodeVisitor implements Python3
       let step: ExpressionNode = new IntNode(1);
       let forStatements: StatementNode[] = [];
       const controlVariable = this.visit(ctx.getChild(1));
-      const rangeNode: FunctionCallNode = this.visit(ctx.getChild(3)) as FunctionCallNode;
+      const rangeNode: FunctionCallNode = this.visit(
+        ctx.getChild(3)
+      ) as FunctionCallNode;
       if (rangeNode.args.length === 1) {
         stop = rangeNode.args[0];
-      }
-      else {
+      } else {
         start = rangeNode.args[0];
         stop = rangeNode.args[1];
         step = rangeNode.args.length === 3 ? rangeNode.args[2] : new IntNode(1);
       }
-      ctx.suite(0).stmt().map(item => forStatements.push(this.visit(item) as StatementNode));
-      return new ForLoopNode(controlVariable as AtomNode, start, stop, step, forStatements);
+      ctx
+        .suite(0)
+        .stmt()
+        .map((item) => forStatements.push(this.visit(item) as StatementNode));
+      return new ForLoopNode(
+        controlVariable as AtomNode,
+        start,
+        stop,
+        step,
+        forStatements
+      );
     }
   }
 }

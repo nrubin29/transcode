@@ -8,22 +8,27 @@ import {
   BinaryLogicalOperation,
   BooleanNode,
   ComparisonNode,
-  ComparisonOperation, DeclarationNode,
+  ComparisonOperation,
+  DeclarationNode,
   DotAccessNode,
   ElseIfStatementNode,
   ElseStatementNode,
   ForLoopNode,
   FunctionCallNode,
-  IfStatementNode, InputNode, IntConversionNode, IntNode,
-  PrimitiveType, PrintNode,
-  RootNode, StatementNode,
+  IfStatementNode,
+  InputNode,
+  IntConversionNode,
+  IntNode,
+  PrintNode,
+  RootNode,
+  StatementNode,
   StringNode,
   Type,
   UnaryLogicalNode,
   UnaryLogicalOperation,
-  WhileLoopNode
+  WhileLoopNode,
 } from './ast';
-import {AstVisitor} from './ast-visitor';
+import { AstVisitor } from './ast-visitor';
 
 /**
  * Traverses an AST and adds depth information.
@@ -39,8 +44,7 @@ export class DepthAstVisitor extends AstVisitor<void> {
     this.visit(arithmetic.right);
   }
 
-  visitArithmeticOperation(operation: ArithmeticOperation): void {
-  }
+  visitArithmeticOperation(operation: ArithmeticOperation): void {}
 
   visitArrayAccessNode(arrayAccess: ArrayAccessNode): void {
     this.visit(arrayAccess.array);
@@ -57,9 +61,7 @@ export class DepthAstVisitor extends AstVisitor<void> {
     this.visit(assignment.value);
   }
 
-  visitAtomNode(atom: AtomNode): void {
-  }
-
+  visitAtomNode(atom: AtomNode): void {}
 
   visitBinaryLogicalNode(logic: BinaryLogicalNode): void {
     this.visit(logic.left);
@@ -82,14 +84,14 @@ export class DepthAstVisitor extends AstVisitor<void> {
 
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): void {
     this.visit(elseIfStatement.condition);
-    elseIfStatement.statements.forEach(statement => {
+    elseIfStatement.statements.forEach((statement) => {
       statement.depth = elseIfStatement.depth + 1;
       this.visit(statement);
     });
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): void {
-    elseStatement.statements.forEach(statement => {
+    elseStatement.statements.forEach((statement) => {
       statement.depth = elseStatement.depth + 1;
       this.visit(statement);
     });
@@ -100,7 +102,7 @@ export class DepthAstVisitor extends AstVisitor<void> {
     this.visit(forLoopNode.start);
     this.visit(forLoopNode.stop);
     this.visit(forLoopNode.step);
-    forLoopNode.statements.forEach(statement => {
+    forLoopNode.statements.forEach((statement) => {
       statement.depth = forLoopNode.depth + 1;
       this.visit(statement);
     });
@@ -108,18 +110,18 @@ export class DepthAstVisitor extends AstVisitor<void> {
 
   visitFunctionCallNode(functionCall: FunctionCallNode): void {
     this.visit(functionCall.func);
-    functionCall.args.forEach(arg => this.visit(arg));
+    functionCall.args.forEach((arg) => this.visit(arg));
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): void {
     this.visit(ifStatement.condition);
 
-    ifStatement.statements.forEach(statement => {
+    ifStatement.statements.forEach((statement) => {
       statement.depth = ifStatement.depth + 1;
       this.visit(statement);
     });
 
-    ifStatement.elseIfs.forEach(elseIf => {
+    ifStatement.elseIfs.forEach((elseIf) => {
       elseIf.depth = ifStatement.depth;
       this.visit(elseIf);
     });
@@ -131,7 +133,7 @@ export class DepthAstVisitor extends AstVisitor<void> {
   }
 
   visitRootNode(root: RootNode): void {
-    root.children.forEach(statement => this.visit(statement));
+    root.children.forEach((statement) => this.visit(statement));
   }
 
   visitUnaryLogicalNode(logic: UnaryLogicalNode): void {
@@ -142,7 +144,7 @@ export class DepthAstVisitor extends AstVisitor<void> {
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): void {
     this.visit(whileLoop.condition);
-    whileLoop.statements.forEach(statement => {
+    whileLoop.statements.forEach((statement) => {
       statement.depth = whileLoop.depth + 1;
       this.visit(statement);
     });
@@ -150,21 +152,15 @@ export class DepthAstVisitor extends AstVisitor<void> {
 
   visitType(type: Type): void {}
 
-  visitBooleanNode(bool: BooleanNode): void {
-  }
+  visitBooleanNode(bool: BooleanNode): void {}
 
-  visitStringNode(str: StringNode): void {
-  }
+  visitStringNode(str: StringNode): void {}
 
-  visitIntNode(int: IntNode): void {
-  }
+  visitIntNode(int: IntNode): void {}
 
-  visitInputNode(input: InputNode): void {
-  }
+  visitInputNode(input: InputNode): void {}
 
-  visitPrintNode(print: PrintNode): void {
-  }
+  visitPrintNode(print: PrintNode): void {}
 
-  visitIntConversionNode(intConversion: IntConversionNode): void {
-  }
+  visitIntConversionNode(intConversion: IntConversionNode): void {}
 }

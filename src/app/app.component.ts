@@ -1,38 +1,47 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
-import {Python3Service} from './langs/python3/python3.service';
-import {JavaService} from './langs/java/java.service';
-import {TypescriptService} from './langs/typescript/typescript.service';
-import {LanguageService} from './langs/language-service';
-import {CodemirrorComponent} from './codemirror/codemirror.component';
-import {ParseTree} from 'antlr4ts/tree';
-import {Ast} from './langs/ast';
-import {MatDialog} from '@angular/material/dialog';
-import {TreesComponent} from './trees/trees.component';
-import {GifComponent} from './gif/gif.component';
-import {AboutComponent} from './about/about.component';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Python3Service } from './langs/python3/python3.service';
+import { JavaService } from './langs/java/java.service';
+import { TypescriptService } from './langs/typescript/typescript.service';
+import { LanguageService } from './langs/language-service';
+import { CodemirrorComponent } from './codemirror/codemirror.component';
+import { ParseTree } from 'antlr4ts/tree';
+import { Ast } from './langs/ast';
+import { MatDialog } from '@angular/material/dialog';
+import { TreesComponent } from './trees/trees.component';
+import { GifComponent } from './gif/gif.component';
+import { AboutComponent } from './about/about.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
   sourceLanguage: LanguageInfo;
   targetLanguage: LanguageInfo;
 
-  @ViewChild('source', {static: true}) source: CodemirrorComponent;
-  @ViewChild('target', {static: true}) target: CodemirrorComponent;
+  @ViewChild('source', { static: true }) source: CodemirrorComponent;
+  @ViewChild('target', { static: true }) target: CodemirrorComponent;
 
   antlrTree: ParseTree;
   ast: Ast;
 
-  languages: {[name: string]: LanguageInfo} = {
-    python3: {name: 'Python 3', mode: 'text/x-python', service: this.python3},
-    java: {name: 'Java', mode: 'text/x-java', service: this.java},
-    typeScript: {name: 'TypeScript', mode: 'text/typescript', service: this.typescript}
+  languages: { [name: string]: LanguageInfo } = {
+    python3: { name: 'Python 3', mode: 'text/x-python', service: this.python3 },
+    java: { name: 'Java', mode: 'text/x-java', service: this.java },
+    typeScript: {
+      name: 'TypeScript',
+      mode: 'text/typescript',
+      service: this.typescript,
+    },
   };
 
-  constructor(private python3: Python3Service, private java: JavaService, private typescript: TypescriptService, private dialog: MatDialog) {}
+  constructor(
+    private python3: Python3Service,
+    private java: JavaService,
+    private typescript: TypescriptService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit() {
     this.sourceLanguage = this.languageValues[0];
@@ -86,14 +95,18 @@ export class AppComponent implements OnInit {
     const ref = this.dialog.open(GifComponent, {
       data: {
         from: this.sourceLanguage.name.toLowerCase(),
-        to: this.targetLanguage.name.toLowerCase()
-      }
+        to: this.targetLanguage.name.toLowerCase(),
+      },
     });
 
     setTimeout(() => {
-      this.antlrTree = this.sourceLanguage.service.convertCodeToAntlr(this.source.value);
+      this.antlrTree = this.sourceLanguage.service.convertCodeToAntlr(
+        this.source.value
+      );
       this.ast = this.sourceLanguage.service.convertAntlrToAst(this.antlrTree);
-      this.target.writeValue(this.targetLanguage.service.convertAstToCode(this.ast));
+      this.target.writeValue(
+        this.targetLanguage.service.convertAstToCode(this.ast)
+      );
       ref.close();
     }, 1500);
   }
@@ -104,8 +117,8 @@ export class AppComponent implements OnInit {
       height: '100vh',
       data: {
         antlrTree: this.antlrTree,
-        ast: this.ast
-      }
+        ast: this.ast,
+      },
     });
   }
 

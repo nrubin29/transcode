@@ -1,17 +1,17 @@
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
-import {MAT_DIALOG_DATA} from '@angular/material/dialog';
-import {MatTabChangeEvent} from '@angular/material/tabs';
-import {Ast} from '../langs/ast';
-import {ParserRuleContext} from 'antlr4ts';
-import {TerminalNode} from 'antlr4ts/tree';
-import {TreantAstVisitor} from './treant-ast-visitor';
+import { AfterViewInit, Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatTabChangeEvent } from '@angular/material/tabs';
+import { Ast } from '../langs/ast';
+import { ParserRuleContext } from 'antlr4ts';
+import { TerminalNode } from 'antlr4ts/tree';
+import { TreantAstVisitor } from './treant-ast-visitor';
 
 declare var Treant: any;
 
 @Component({
   selector: 'app-trees',
   templateUrl: './trees.component.html',
-  styleUrls: ['./trees.component.scss']
+  styleUrls: ['./trees.component.scss'],
 })
 export class TreesComponent implements OnInit, AfterViewInit {
   antlrTree: ParserRuleContext;
@@ -20,7 +20,7 @@ export class TreesComponent implements OnInit, AfterViewInit {
   antlrChart: any;
   astChart: any;
 
-  constructor(@Inject(MAT_DIALOG_DATA) private data: any) { }
+  constructor(@Inject(MAT_DIALOG_DATA) private data: any) {}
 
   ngOnInit() {
     this.antlrTree = this.data.antlrTree;
@@ -28,27 +28,25 @@ export class TreesComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.tabChange({index: 0} as any);
+    this.tabChange({ index: 0 } as any);
   }
 
   tabChange(e: MatTabChangeEvent) {
     if (e.index === 0 && !this.antlrChart) {
       this.antlrChart = new Treant({
         chart: {
-          container: '#antlr-tree'
+          container: '#antlr-tree',
         },
-        nodeStructure: this.visit(this.antlrTree)
+        nodeStructure: this.visit(this.antlrTree),
       });
-    }
-
-    else if (e.index === 1 && !this.astChart) {
+    } else if (e.index === 1 && !this.astChart) {
       const visitor = new TreantAstVisitor();
       console.log(visitor.visit(this.ast.root));
       this.antlrChart = new Treant({
         chart: {
-          container: '#ast-tree'
+          container: '#ast-tree',
         },
-        nodeStructure: visitor.visit(this.ast.root)
+        nodeStructure: visitor.visit(this.ast.root),
       });
     }
   }
@@ -58,14 +56,14 @@ export class TreesComponent implements OnInit, AfterViewInit {
 
     if (node instanceof TerminalNode) {
       return {
-        text: {name: node.text}
+        text: { name: node.text },
       };
-    }
-
-    else {
+    } else {
       return {
-        text: {name: node.constructor.name},
-        children: node.children.map(child => this.visit(child as ParserRuleContext))
+        text: { name: node.constructor.name },
+        children: node.children.map((child) =>
+          this.visit(child as ParserRuleContext)
+        ),
       };
     }
   }

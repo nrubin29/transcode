@@ -1,7 +1,7 @@
-import {Ast} from './ast';
-import {ParserRuleContext} from 'antlr4ts';
-import {TypeAstVisitor} from './type-ast-visitor';
-import {DepthAstVisitor} from './depth-ast-visitor';
+import { Ast } from './ast';
+import { ParserRuleContext } from 'antlr4ts';
+import { TypeAstVisitor } from './type-ast-visitor';
+import { DepthAstVisitor } from './depth-ast-visitor';
 
 /**
  * The interface implemented by all services that provide a language.
@@ -9,6 +9,7 @@ import {DepthAstVisitor} from './depth-ast-visitor';
  */
 export abstract class LanguageService<R extends ParserRuleContext> {
   abstract convertCodeToAntlr(code: string): R;
+
   abstract convertAntlrToAst(antlrRoot: R): Ast;
 
   convertAstToCode(ast: Ast): string {

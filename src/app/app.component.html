@@ -2,7 +2,9 @@
   <mat-toolbar-row>
     <code>transc&lt;&gt;de</code>
     <span class="spacer"></span>
-    <button mat-icon-button (click)="about()"><mat-icon aria-hidden="false" aria-label="About">information</mat-icon></button>
+    <button mat-icon-button (click)="about()">
+      <mat-icon aria-hidden="false" aria-label="About">information</mat-icon>
+    </button>
   </mat-toolbar-row>
 </mat-toolbar>
 <div class="container">
@@ -28,7 +30,8 @@
   </div>
   <div class="flex display-side" style="margin: 1em 0">
     <div>
-      <button mat-raised-button color="primary" (click)="showTrees()" [disabled]="!antlrTree || !ast">Show trees</button>
+      <button mat-raised-button color="primary" (click)="showTrees()" [disabled]="!antlrTree || !ast">Show trees
+      </button>
     </div>
     <div class="flex right">
       <button mat-raised-button color="primary" (click)="translate()">Translate Code</button>
@@ -40,7 +43,9 @@
       <mat-grid-list cols="4" rowHeight="100px">
         <mat-grid-tile [colspan]="1" [rowspan]="1">Logical operators (and, or, not)</mat-grid-tile>
         <mat-grid-tile [colspan]="1" [rowspan]="1">Comparison operators (equals, not equals, etc.)</mat-grid-tile>
-        <mat-grid-tile [colspan]="1" [rowspan]="1">Arithmetic (addition, subtraction, multiplication, division, modulus)</mat-grid-tile>
+        <mat-grid-tile [colspan]="1" [rowspan]="1">Arithmetic (addition, subtraction, multiplication, division,
+          modulus)
+        </mat-grid-tile>
         <mat-grid-tile [colspan]="1" [rowspan]="1">Variable declaration and assignment</mat-grid-tile>
         <mat-grid-tile [colspan]="1" [rowspan]="1">If statements (if, else if, else)</mat-grid-tile>
         <mat-grid-tile [colspan]="1" [rowspan]="1">For loops</mat-grid-tile>

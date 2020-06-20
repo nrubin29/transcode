@@ -1,5 +1,12 @@
-import {ParseTree} from 'antlr4ts/tree';
-import {ArithmeticOperation, AtomNode, BinaryLogicalOperation, ComparisonOperation, Node, UnaryLogicalOperation} from './ast';
+import { ParseTree } from 'antlr4ts/tree';
+import {
+  ArithmeticOperation,
+  AtomNode,
+  BinaryLogicalOperation,
+  ComparisonOperation,
+  Node,
+  UnaryLogicalOperation,
+} from './ast';
 
 /**
  * The superclass for all classes that visit an ANTLR tree.
@@ -15,9 +22,7 @@ export abstract class TranscodeVisitor {
       }
 
       return node;
-    }
-
-    catch (e) {
+    } catch (e) {
       if (e.message !== ':O') {
         console.error(e);
       }
@@ -48,25 +53,41 @@ export abstract class TranscodeVisitor {
 
   visitArithmeticOperation(operation: ParseTree): ArithmeticOperation {
     switch (operation.text) {
-      case '+': return ArithmeticOperation.ADDITION;
-      case '-': return ArithmeticOperation.SUBTRACTION;
-      case '*': return ArithmeticOperation.MULTIPLICATION;
-      case '/': return ArithmeticOperation.DIVISION;
-      case '%': return ArithmeticOperation.MODULUS;
+      case '+':
+        return ArithmeticOperation.ADDITION;
+      case '-':
+        return ArithmeticOperation.SUBTRACTION;
+      case '*':
+        return ArithmeticOperation.MULTIPLICATION;
+      case '/':
+        return ArithmeticOperation.DIVISION;
+      case '%':
+        return ArithmeticOperation.MODULUS;
     }
   }
 
-  abstract visitUnaryLogicalOperation(operation: ParseTree): UnaryLogicalOperation;
-  abstract visitBinaryLogicalOperation(operation: ParseTree): BinaryLogicalOperation;
+  abstract visitUnaryLogicalOperation(
+    operation: ParseTree
+  ): UnaryLogicalOperation;
+
+  abstract visitBinaryLogicalOperation(
+    operation: ParseTree
+  ): BinaryLogicalOperation;
 
   visitComparisonOperation(operation: ParseTree): ComparisonOperation {
     switch (operation.text) {
-      case '==': return ComparisonOperation.EQUALS;
-      case '!=': return ComparisonOperation.NOT_EQUALS;
-      case '>': return ComparisonOperation.GREATER_THAN;
-      case '<': return ComparisonOperation.LESS_THAN;
-      case '>=': return ComparisonOperation.GREATER_THAN_EQUAL_TO;
-      case '<=': return ComparisonOperation.LESS_THAN_EQUAL_TO;
+      case '==':
+        return ComparisonOperation.EQUALS;
+      case '!=':
+        return ComparisonOperation.NOT_EQUALS;
+      case '>':
+        return ComparisonOperation.GREATER_THAN;
+      case '<':
+        return ComparisonOperation.LESS_THAN;
+      case '>=':
+        return ComparisonOperation.GREATER_THAN_EQUAL_TO;
+      case '<=':
+        return ComparisonOperation.LESS_THAN_EQUAL_TO;
     }
   }
 }

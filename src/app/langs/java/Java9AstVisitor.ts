@@ -1,4 +1,4 @@
-import {StringAstVisitor} from '../ast-visitor';
+import { StringAstVisitor } from '../ast-visitor';
 import {
   ArithmeticNode,
   ArrayAccessNode,
@@ -25,7 +25,7 @@ import {
   Type,
   UnaryLogicalNode,
   UnaryLogicalOperation,
-  WhileLoopNode
+  WhileLoopNode,
 } from '../ast';
 
 export class Java9AstVisitor extends StringAstVisitor {
@@ -36,7 +36,9 @@ export class Java9AstVisitor extends StringAstVisitor {
     let val = super.visitRootNode(root);
 
     if (this.hasInput) {
-      val = 'import java.util.Scanner;\n\nScanner s = new Scanner(System.in);\n' + val;
+      val =
+        'import java.util.Scanner;\n\nScanner s = new Scanner(System.in);\n' +
+        val;
     }
 
     return val;
@@ -47,81 +49,178 @@ export class Java9AstVisitor extends StringAstVisitor {
   }
 
   visitFunctionCallNode(functionCall: FunctionCallNode): string {
-    return this.visit(functionCall.func) + '(' + functionCall.args.map(child => this.visit(child)).join(', ') + ')';
+    return (
+      this.visit(functionCall.func) +
+      '(' +
+      functionCall.args.map((child) => this.visit(child)).join(', ') +
+      ')'
+    );
   }
 
   visitArithmeticNode(arithmetic: ArithmeticNode): string {
-    return this.visit(arithmetic.left) + ' ' + this.visitArithmeticOperation(arithmetic.operation) + ' ' + this.visit(arithmetic.right);
+    return (
+      this.visit(arithmetic.left) +
+      ' ' +
+      this.visitArithmeticOperation(arithmetic.operation) +
+      ' ' +
+      this.visit(arithmetic.right)
+    );
   }
 
   visitAssignmentNode(assignment: AssignmentNode): string {
     if (this.variablesSeen.has(assignment.name.atom)) {
       return this.visit(assignment.name) + ' = ' + this.visit(assignment.value);
-    }
-
-    else {
+    } else {
       // This is a hack because Python can't differentiate between assignments and declarations.
       this.variablesSeen.add(assignment.name.atom);
-      return this.visitDeclarationNode(new DeclarationNode(assignment.name, assignment.value));
+      return this.visitDeclarationNode(
+        new DeclarationNode(assignment.name, assignment.value)
+      );
     }
   }
 
   visitBinaryLogicalNode(logic: BinaryLogicalNode): string {
-    return this.visit(logic.left) + ' ' + this.visitBinaryLogicalOperation(logic.operation) + ' ' + this.visit(logic.right);
+    return (
+      this.visit(logic.left) +
+      ' ' +
+      this.visitBinaryLogicalOperation(logic.operation) +
+      ' ' +
+      this.visit(logic.right)
+    );
   }
 
   visitComparisonNode(comparison: ComparisonNode): string {
-    return this.visit(comparison.left) + ' ' + this.visitComparisonOperation(comparison.operation) + ' ' + this.visit(comparison.right);
+    return (
+      this.visit(comparison.left) +
+      ' ' +
+      this.visitComparisonOperation(comparison.operation) +
+      ' ' +
+      this.visit(comparison.right)
+    );
   }
 
   visitDeclarationNode(declaration: DeclarationNode): string {
     this.variablesSeen.add(declaration.name.atom);
-    return this.visitType(declaration.value.type) + ' ' + this.visit(declaration.name) + ' = ' + this.visit(declaration.value);
+    return (
+      this.visitType(declaration.value.type) +
+      ' ' +
+      this.visit(declaration.name) +
+      ' = ' +
+      this.visit(declaration.value)
+    );
   }
 
   visitUnaryLogicalNode(logic: UnaryLogicalNode): string {
-    return this.visitUnaryLogicalOperation(logic.operation) + this.visit(logic.left);
+    return (
+      this.visitUnaryLogicalOperation(logic.operation) + this.visit(logic.left)
+    );
   }
 
   visitBinaryLogicalOperation(operation: BinaryLogicalOperation): string {
     switch (operation) {
-      case BinaryLogicalOperation.AND: return '&&';
-      case BinaryLogicalOperation.OR: return '||';
+      case BinaryLogicalOperation.AND:
+        return '&&';
+      case BinaryLogicalOperation.OR:
+        return '||';
     }
   }
 
   visitUnaryLogicalOperation(operation: UnaryLogicalOperation): string {
     switch (operation) {
-      case UnaryLogicalOperation.NOT: return '!';
+      case UnaryLogicalOperation.NOT:
+        return '!';
     }
   }
 
   visitArrayAccessNode(arrayAccess: ArrayAccessNode): string {
-    return this.visit(arrayAccess.array)  + '[' + this.visit(arrayAccess.index) + ']';
+    return (
+      this.visit(arrayAccess.array) + '[' + this.visit(arrayAccess.index) + ']'
+    );
   }
 
   visitDotAccessNode(dotAccess: DotAccessNode): string {
-    return this.visit(dotAccess.left)  + '.' + this.visit(dotAccess.right);
+    return this.visit(dotAccess.left) + '.' + this.visit(dotAccess.right);
   }
 
   visitIfStatementNode(ifStatement: IfStatementNode): string {
-    return 'if (' + this.visit(ifStatement.condition) + ') {\n' + ifStatement.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(ifStatement.depth) + '}' + (ifStatement.elseIfs.length > 0 ? '\n\n' : '') + ifStatement.elseIfs.map(elseIf => this.visit(elseIf)).join('\n\n') + (ifStatement.els ? '\n\n' + this.visit(ifStatement.els) : '');
+    return (
+      'if (' +
+      this.visit(ifStatement.condition) +
+      ') {\n' +
+      ifStatement.statements
+        .map((statement) => this.visit(statement))
+        .join('\n') +
+      '\n' +
+      this.indentation(ifStatement.depth) +
+      '}' +
+      (ifStatement.elseIfs.length > 0 ? '\n\n' : '') +
+      ifStatement.elseIfs.map((elseIf) => this.visit(elseIf)).join('\n\n') +
+      (ifStatement.els ? '\n\n' + this.visit(ifStatement.els) : '')
+    );
   }
 
   visitElseIfStatementNode(elseIfStatement: ElseIfStatementNode): string {
-    return 'else if (' + this.visit(elseIfStatement.condition) + ') {\n' + elseIfStatement.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(elseIfStatement.depth) + '}';
+    return (
+      'else if (' +
+      this.visit(elseIfStatement.condition) +
+      ') {\n' +
+      elseIfStatement.statements
+        .map((statement) => this.visit(statement))
+        .join('\n') +
+      '\n' +
+      this.indentation(elseIfStatement.depth) +
+      '}'
+    );
   }
 
   visitElseStatementNode(elseStatement: ElseStatementNode): string {
-    return 'else {\n' + elseStatement.statements.map(statement => this.visit(statement)) + '\n' + this.indentation(elseStatement.depth) + '}';
+    return (
+      'else {\n' +
+      elseStatement.statements.map((statement) => this.visit(statement)) +
+      '\n' +
+      this.indentation(elseStatement.depth) +
+      '}'
+    );
   }
 
   visitForLoopNode(forLoopNode: ForLoopNode): string {
-    return 'for (' + this.visitType(forLoopNode.start.type) + ' ' + this.visit(forLoopNode.controlVariable) + ' = ' + this.visit(forLoopNode.start) + '; ' + this.visit(forLoopNode.controlVariable) + ' < ' + this.visit(forLoopNode.stop) + '; ' + this.visit(forLoopNode.controlVariable) + ' += ' + this.visit(forLoopNode.step) + ') {\n' + forLoopNode.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(forLoopNode.depth) + '}';
+    return (
+      'for (' +
+      this.visitType(forLoopNode.start.type) +
+      ' ' +
+      this.visit(forLoopNode.controlVariable) +
+      ' = ' +
+      this.visit(forLoopNode.start) +
+      '; ' +
+      this.visit(forLoopNode.controlVariable) +
+      ' < ' +
+      this.visit(forLoopNode.stop) +
+      '; ' +
+      this.visit(forLoopNode.controlVariable) +
+      ' += ' +
+      this.visit(forLoopNode.step) +
+      ') {\n' +
+      forLoopNode.statements
+        .map((statement) => this.visit(statement))
+        .join('\n') +
+      '\n' +
+      this.indentation(forLoopNode.depth) +
+      '}'
+    );
   }
 
   visitWhileLoopNode(whileLoop: WhileLoopNode): string {
-    return 'while (' + this.visit(whileLoop.condition) + ') {\n' + whileLoop.statements.map(statement => this.visit(statement)).join('\n') + '\n' + this.indentation(whileLoop.depth) + '}';
+    return (
+      'while (' +
+      this.visit(whileLoop.condition) +
+      ') {\n' +
+      whileLoop.statements
+        .map((statement) => this.visit(statement))
+        .join('\n') +
+      '\n' +
+      this.indentation(whileLoop.depth) +
+      '}'
+    );
   }
 
   visitBooleanNode(bool: BooleanNode): string {
@@ -148,10 +247,16 @@ export class Java9AstVisitor extends StringAstVisitor {
   visitPrintNode(print: PrintNode): string {
     if (print.args.length === 0) {
       return 'System.out.println()';
-    }
-
-    else {
-      return print.args.map((pr, i) => (i !== 0 ? this.indentation(print.depth) : '') + 'System.out.println(' + this.visit(pr) + ');').join('\n');
+    } else {
+      return print.args
+        .map(
+          (pr, i) =>
+            (i !== 0 ? this.indentation(print.depth) : '') +
+            'System.out.println(' +
+            this.visit(pr) +
+            ');'
+        )
+        .join('\n');
     }
   }
 
@@ -159,11 +264,21 @@ export class Java9AstVisitor extends StringAstVisitor {
     let typeName: string;
 
     switch (type.type) {
-      case PrimitiveType.BOOLEAN: typeName = 'boolean'; break;
-      case PrimitiveType.FLOAT: typeName = 'float'; break;
-      case PrimitiveType.INTEGER: typeName = 'int'; break;
-      case PrimitiveType.OBJECT: typeName = 'Object'; break;
-      case PrimitiveType.STRING: typeName = 'String'; break;
+      case PrimitiveType.BOOLEAN:
+        typeName = 'boolean';
+        break;
+      case PrimitiveType.FLOAT:
+        typeName = 'float';
+        break;
+      case PrimitiveType.INTEGER:
+        typeName = 'int';
+        break;
+      case PrimitiveType.OBJECT:
+        typeName = 'Object';
+        break;
+      case PrimitiveType.STRING:
+        typeName = 'String';
+        break;
     }
 
     if (type.isArray) {
